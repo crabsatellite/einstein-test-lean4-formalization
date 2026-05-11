@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Cache Mathlib
+        uses: actions/cache@v4
+        with:
+          path: .lake
+          key: lake-${{ runner.os }}-${{ hashFiles('lean-toolchain', 'lakefile.toml', 'lake-manifest.json') }}
+          restore-keys: lake-${{ runner.os }}-
+
+      - name: Get Mathlib cache
+        run: lake exe cache get || true
+
+      - name: Build
+        run: lake build
+
+      - name: Verify no sorry in source
+        run: |
+          if grep -rn '\bsorry\b' EinsteinTest/ --include="*.lean" | grep -v '^\s*--' | grep -v 'sorry-free' | grep -v 'no sorry' | grep -v 'zero sorry'; then
+            echo "ERROR: sorry found in source code"
+            exit 1
+          fi
+
+      - name: Verify axiom count
+        run: |
+          AXIOM_COUNT=$(grep -h "^axiom " EinsteinTest/*.lean | wc -l)
+          if [ "$AXIOM_COUNT" -ne 8 ]; then
+            echo "ERROR: expected 8 axioms, found $AXIOM_COUNT"
+            exit 1
+          fi
+
+      - name: Run axiom audit
+        run: lake env lean EinsteinTest/AxiomAudit.lean

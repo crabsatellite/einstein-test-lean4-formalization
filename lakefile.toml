@@ -1,0 +1,15 @@
+name = "EinsteinTest"
+version = "0.1.0"
+keywords = ["philosophy-of-ai", "recursion-theory", "kolmogorov-complexity", "verification-asymmetry"]
+defaultTargets = ["EinsteinTest"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+
+[[lean_lib]]
+name = "EinsteinTest"
