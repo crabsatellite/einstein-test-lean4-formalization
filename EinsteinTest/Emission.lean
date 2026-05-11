@@ -17,26 +17,38 @@
   Axioms: Kolmogorov complexity `K` is introduced via a small set of
   single-step typed bridges (universality, conditional coding theorem,
   chain rule, monotonicity-under-conditioning).  Each bridge is a
-  textbook lemma; we cite Li & Vitányi, 3rd ed. (2008):
+  textbook lemma; primary citation Li & Vitányi, 3rd ed. (2008), with
+  Vitányi 2013 (TCS 501) added for the conditional coding theorem
+  where the conditional convention was non-standard prior to 2013:
 
-    * `K_codingTheorem`     ←  Li-Vitányi Thm 4.3.4 (conditional coding theorem)
+    * `K_codingTheorem`     ←  Li-Vitányi Thm 4.3.4 (conditional coding theorem);
+                                supplementary: Vitányi, *Theoretical Computer
+                                Science* 501 (2013), 93–100 (arXiv:1206.0983),
+                                explicit conditional-version proof
     * `K_chainRule_pair`    ←  Li-Vitányi Thm 3.9.1 (symmetric-information chain rule, pair-LHS)
-    * `K_condMonotone`      ←  Li-Vitányi 2.1.8 (monotonicity under conditioning)
+    * `K_pairNonDecrease`   ←  Li-Vitányi §3.1 (information non-decrease under pairing;
+                                immediate from prefix-free pair-decoding)
+    * `K_condMonotone`      ←  Li-Vitányi §3.1 / §3.4 (prefix-`K` analogue of plain-
+                                complexity Thm 2.1.8 / Ch 2: extra conditioning cannot
+                                raise prefix complexity by more than a constant;
+                                immediate by relativizing the universal prefix machine)
     * `K_descLength`        ←  Li-Vitányi §2.1 (immediate consequence of the
                                 Invariance Theorem (Thm 2.1.1) via the literal-
-                                output universal program: `K(y|z) ≤ |y| + c`)
+                                output universal program: `K(y|z) ≤ |y| + c`;
+                                REQUIRES `descLen y` to include self-delimiting
+                                overhead — see axiom docstring for convention)
 
   The single-LHS variant of the chain rule (`K_chainRule_single`) is *derived*
   as a Lean lemma from `K_chainRule_pair`, `K_condMonotone`, and `K_descLength`,
   and is therefore not a separate axiom (per `feedback_lean_axiom_decomposition`:
   no composite axioms).
 
-  *Lean v0.1 design choice:* `K` is a single abstract real-valued
-  function on an opaque encoding type.  The chain rule and friends
-  are stated as inequalities between real numbers over this type;
-  the algebraic combination is then a pure-arithmetic chain.  This
-  matches `feedback_lean_axiom_decomposition` (single-step typed
-  bridges, no composite axioms).
+  *Design choice:* `K` is a single abstract real-valued function on
+  an opaque encoding type.  The chain rule and friends are stated as
+  inequalities between real numbers over this type; the algebraic
+  combination is then a pure-arithmetic chain.  This matches
+  `feedback_lean_axiom_decomposition` (single-step typed bridges, no
+  composite axioms).
 -/
 
 import EinsteinTest.Basic
@@ -53,9 +65,10 @@ namespace EinsteinTest
     Implementation: `ℕ` is used as a concrete (Gödel-numbering style)
     realisation of the abstract object type.  The bridges below remain
     abstract over `KObj`; only the inhabitation instance and the type
-    constructor are concrete.  A full v0.2 formalization can refine
-    `KObj` to `List Bool` (binary strings) or `Nat.Partrec.Code` without
-    invalidating the algebraic chain in `thm_emission`. -/
+    constructor are concrete.  A more refined formalisation could
+    instantiate `KObj` as `List Bool` (binary strings) or
+    `Nat.Partrec.Code` without invalidating the algebraic chain in
+    `thm_emission`. -/
 def KObj : Type := ℕ
 
 instance : Inhabited KObj := ⟨(0 : ℕ)⟩
@@ -109,7 +122,7 @@ opaque descLen : KObj → ℝ
 opaque μAssignsAtLeast : KObj → KObj → ℝ → Prop
 
 /-- **Bridge 1 (Conditional coding theorem; Li-Vitányi, 3rd ed. (2008),
-    Thm 4.3.4).**
+    Thm 4.3.4; explicit conditional-version proof in Vitányi 2013).**
     There exists an additive constant `c` (depending only on the
     universal prefix machine, not on `(x, μDesc, k)`) such that for
     every computable distribution `μ` (encoded by `μDesc`) assigning
@@ -118,7 +131,12 @@ opaque μAssignsAtLeast : KObj → KObj → ℝ → Prop
 
     *Citation:* Li & Vitányi, *An Introduction to Kolmogorov Complexity
     and Its Applications* (3rd ed., 2008), Theorem 4.3.4 (conditional
-    version). -/
+    version).  Note: the unconditional coding theorem appears as
+    Thm 4.3.3; the conditional version (Thm 4.3.4) was non-standard
+    in the literature prior to Vitányi, *Theoretical Computer Science*
+    **501** (2013), 93–100 (arXiv:1206.0983), which supplies the
+    explicit conditional-version proof under the standard convention.
+    Cited here as the operative source for the conditional bound. -/
 axiom K_codingTheorem :
     ∃ c : ℝ, ∀ (x μDesc : KObj) (k : ℝ),
       μAssignsAtLeast μDesc x k → K[x|μDesc] ≤ k + c
@@ -166,23 +184,24 @@ lemma K_chainRule_apply (x y z : KObj) (L : ℝ) :
   Classical.choose_spec K_chainRule_pair x y z L
 
 /-- **Bridge 2' (Information non-decrease under pairing; Li-Vitányi,
-    3rd ed. (2008), §3.1 / Thm 2.2.1 corollary).**
+    3rd ed. (2008), §3.1).**
     There exists an additive constant `c` such that
 
     `K(x | z) ≤ K(encodePair x y | z) + c`.
 
-    *Citation:* Li & Vitányi, 3rd ed. (2008), §3.1: a universal prefix
-    program for `x` is obtained from a program for `(x, y)` by appending
-    a fixed projection routine (extract first component, length `O(1)`),
-    yielding the additive overhead `c`.  Equivalently: information
-    cannot decrease under pairing, since the first component is
-    recoverable from the pair via the standard `encodePair` decoder.
+    *Citation:* Li & Vitányi, 3rd ed. (2008), §3.1: immediate from
+    prefix-free pair-decoding, `K(x|z) ≤ K(⟨x,y⟩|z) + c`.  A universal
+    prefix program for `x` is obtained from a program for `(x, y)` by
+    appending a fixed projection routine (extract first component,
+    length `O(1)`), yielding the additive overhead `c`.  Equivalently:
+    information cannot decrease under pairing, since the first component
+    is recoverable from the pair via the standard `encodePair` decoder.
 
     *Decomposition rationale (per `feedback_lean_axiom_decomposition`):*
     This is a single-step typed bridge separate from `K_chainRule_pair`;
     decomposed out so that the single-LHS variant of the chain rule
-    (which the original v0.4 axiom bundled with the pair-LHS variant)
-    can be DERIVED inside Lean rather than axiomatized as a composite. -/
+    can be DERIVED inside Lean (see `K_chainRule_single_apply`) rather
+    than axiomatized as a composite. -/
 axiom K_pairNonDecrease :
     ∃ c : ℝ, ∀ (x y z : KObj),
       K[x | z] ≤ K[encodePair x y | z] + c
@@ -219,8 +238,8 @@ lemma K_chainRule_single_apply (x y z : KObj) (L : ℝ) :
     K_chainRule_apply x y z L
   linarith
 
-/-- **Bridge 3 (Conditioning monotonicity; Li-Vitányi, 3rd ed. (2008),
-    Thm 2.1.8).**
+/-- **Bridge 3 (Conditioning monotonicity; prefix-`K` analogue of
+    Li-Vitányi Ch 2 plain-complexity result, 3rd ed. (2008), §3.1 / §3.4).**
     There exists an additive constant `c` such that adding side-
     information `z` cannot raise the conditional complexity by more
     than `c`:
@@ -228,8 +247,10 @@ lemma K_chainRule_single_apply (x y z : KObj) (L : ℝ) :
     `K(x | y, z) ≤ K(x | y) + c`.
 
     *Citation:* Li & Vitányi, *An Introduction to Kolmogorov Complexity
-    and Its Applications* (3rd ed., 2008), Theorem 2.1.8 (extra
-    conditioning cannot raise complexity). -/
+    and Its Applications* (3rd ed., 2008), §3.1 / §3.4: the prefix-`K`
+    analogue of the Ch 2 plain-`C` result Thm 2.1.8 (extra conditioning
+    cannot raise prefix complexity by more than a constant; immediate
+    by relativizing the universal prefix machine). -/
 axiom K_condMonotone :
     ∃ c : ℝ, ∀ (x y z : KObj),
       K[x|encodePair y z] ≤ K[x|y] + c
@@ -260,7 +281,17 @@ lemma K_condMonotone_apply (x y z : KObj) :
     claim `∀ universal K_1, K_2, ∃ c, |K_1 - K_2| ≤ c`; the description-
     length corollary is the standard immediate-consequence application
     of Thm 2.1.1 and appears throughout §2.1 / §3.1 as a basic
-    upper bound.) -/
+    upper bound.)
+
+    *REQUIRES `descLen y` to include self-delimiting overhead*: i.e.,
+    `descLen y` must be the length of a prefix-free code for `y`, not
+    raw `|y|`.  Without self-delimiting overhead the textbook bound is
+    `K(y | z) ≤ |y| + 2 log |y| + c` (the `2 log |y|` term is the
+    self-delimiting encoding of the length prefix).  The
+    `descLen`-includes-prefix-coding convention is the standard
+    interpretation in this formalization and matches §3.1's
+    self-delimiting binary description; under that convention the
+    bound `K(y|z) ≤ descLen y + c` is exact. -/
 axiom K_descLength :
     ∃ c : ℝ, ∀ (y z : KObj),
       K[y|z] ≤ descLen y + c

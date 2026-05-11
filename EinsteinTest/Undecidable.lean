@@ -8,17 +8,32 @@
 
   Companion to: "What the Karpowicz Theorem Does Not Prove" (Li, 2026).
 
-  Construction (post-R5 redesign): for each Turing machine code `e`,
+  Construction: for each Turing machine code `e`,
   let `T*_e := Q ∪ {S* ↔ H_e}` where `S*` is a fresh 0-ary predicate
   outside `L_0`'s signature and `H_e := ∃t. T(e, 0, t)` is the
   arithmetic halting predicate for `e`. By the conservativity-of-
   definitional-extension lemma (Shoenfield 1967 *Mathematical Logic*
   §4.6 (Extensions by definitions), p. 57f; see also Hodges 1997
   *A Shorter Model Theory* §2.6 (conservative-extension material on
-  p. 58 and surrounding discussion) / Boolos-Burgess-Jeffrey 2007
-  *Computability and Logic* 5th ed. Ch. 16 §16.4 (Robinson Arithmetic)),
-  `T*_e` is consistent over `Q` regardless of the truth of `H_e`.
-  The Halt ⇒ Dist many-one reduction is `e ↦ (T*_e, T_0)`.
+  p. 58 and surrounding discussion)), `T*_e` is consistent over `Q`
+  regardless of the truth of `H_e`.  The Halt ⇒ Dist many-one
+  reduction is `e ↦ (T*_e, T_0)`.
+
+  *Note on Q-naming:* "Robinson's Q" in this file refers to the
+  standard finitely-axiomatized fragment of Peano arithmetic per
+  Hájek-Pudlák 1998 (Springer, *Metamathematics of First-Order
+  Arithmetic*) Chapter I (Σ₁-completeness of Q as a numbered theorem)
+  and Smith 2013 (Cambridge, *An Introduction to Gödel's Theorems*,
+  2nd ed.) Ch 11 ("What Q can prove").  We deliberately avoid citing
+  Boolos-Burgess-Jeffrey *Computability and Logic* (5th ed., 2007) as
+  the operative source because BBJ use a DIFFERENT naming convention:
+  BBJ's "Q" is Shoenfield-style minimal arithmetic (§16.2) and BBJ's
+  "R" is what they label as "Robinson arithmetic" (§16.4); these are
+  distinct theories (see the Wikipedia article on Robinson arithmetic
+  for the explicit comparison: "Robinson arithmetic and the minimal
+  arithmetic discussed in Boolos, Burgess and Jeffrey are two distinct
+  theories").  BBJ may still be cited as a secondary textbook source
+  with this naming caveat made explicit.
 
   *Important caveat (Remark~\ref{rem:adversarial-not-E3}):* the
   adversarial `T*_e` is by construction an explicit definitional
@@ -28,9 +43,10 @@
   verifiers. Cor `no-universal` transfers the lower bound to any
   super-family of Dist-deciders.
 
-  *Lean formalization scope (v0.4):* full encoding of first-order
-  theories as `Nat.Partrec.Code`-indexed objects with the conservativity
-  lemma is deferred.  This module:
+  *Lean formalization scope:* full encoding of first-order theories
+  as `Nat.Partrec.Code`-indexed objects with the conservativity lemma
+  is deferred (see `gap_FOTheory_encoding_BLOCKED` in
+  `EinsteinTest.Ledger`).  This module:
 
     * provides the unconditional Σ⁰₂ upper bound (`thm_undecidable_sigma02_upper`)
       as a pure-logic equivalence;
@@ -42,9 +58,9 @@
       (`Bridge_Tarski_RCF_Correctness`).
 
   All bridges are single-step (per `feedback_lean_axiom_decomposition`)
-  and pure single-category (per v0.4 split); the axiom-dependency
-  surface in `AxiomAudit.lean` shows exactly which textbook facts
-  each theorem relies on.
+  and pure single-category; the axiom-dependency surface in
+  `AxiomAudit.lean` shows exactly which textbook facts each theorem
+  relies on.
 -/
 
 import EinsteinTest.Basic
@@ -82,14 +98,14 @@ def Dist (W : ObservationalWorld) (T1 T2 : W.Th) : Prop :=
 
 /-! ### Halt-iff-Dist bridges: two PURE single-category axioms.
 
-  v0.4 split (post-v0.3): the previous `HaltDistBundle` packed four
-  conjuncts of MIXED category — two textbook citations (Σ⁰₁-completeness
-  of Robinson Q from BBJ + Rogers; conservativity of definitional
-  extension from Hodges) bundled together with two paper-novel
-  encoding stipulations for the construction `T*_e := Q ∪ {S* ↔ H_e}`.
-
   Per the trust policy (every axiom must be PURE single-category), the
-  bundle is split into two independent axioms:
+  recursion-theoretic content is split into two independent axioms
+  (textbook citations: Σ⁰₁-completeness of Robinson Q from Hájek-Pudlák
+  1998 Ch I / Smith 2013 Ch 11; Σ⁰₁-soundness via N ⊨ Q from
+  Tarski-Mostowski-Robinson 1953; conservativity of definitional
+  extension from Shoenfield 1967 §4.6 / Hodges 1997 §2.6, on top of
+  two paper-novel encoding stipulations for the construction
+  `T*_e := Q ∪ {S* ↔ H_e}`):
 
     * `Bridge_Tstar_e_Encoding` — PURE Category 3 paper-novel.  Witnesses
       the EXISTENCE of (Sstar, qHe, T0_enc, Tstar_enc) satisfying ONLY
@@ -100,15 +116,17 @@ def Dist (W : ObservationalWorld) (T1 T2 : W.Th) : Prop :=
     * `Bridge_Q_DefExt_TextbookFacts` — PURE Category 1 literature.
       A UNIVERSAL claim: for ANY 4-tuple (Sstar, qHe, T0_enc, Tstar_enc)
       satisfying the paper's encoding properties (iii)+(iv), the
-      textbook facts (i) `qHe e ↔ Halt(e)` (BBJ + Rogers) and (ii)
-      conservativity outside `S*` (Hodges) hold.  Contains no
-      paper-novel content; pure textbook conclusions about any
-      structure with the paper's encoding properties.
+      textbook facts (i) `qHe e ↔ Halt(e)` (Hájek-Pudlák 1998 Ch I /
+      Smith 2013 Ch 11 for Σ⁰₁-completeness, Tarski-Mostowski-Robinson
+      1953 for N ⊨ Q yielding Σ⁰₁-soundness) and (ii) conservativity
+      outside `S*` (Shoenfield 1967 §4.6, primary; Hodges 1997 §2.6,
+      secondary) hold.  Contains no paper-novel content; pure textbook
+      conclusions about any structure with the paper's encoding
+      properties.
 
   Downstream theorems (`Bridge_Halt_Iff_Dist`, `thm_undecidable_sigma01_hard`,
   `cor_no_universal`) destructure both axioms and chain the
-  conclusions — proof structure identical to the v0.3
-  `HaltDistBundle`-based proof; only the destructuring step changes.
+  conclusions.
 
   *Citations:*
     * Shoenfield, *Mathematical Logic* (Addison-Wesley, 1967) §4.6
@@ -118,22 +136,25 @@ def Dist (W : ObservationalWorld) (T1 T2 : W.Th) : Prop :=
     * Hodges, *A Shorter Model Theory* (Cambridge UP, 1997) §2.6
       (translations / definitional extensions); conservative-
       extension material on p. 58 and surrounding discussion
-      (secondary, by section rather than theorem number — the
-      specific theorem-number citation that previously appeared
-      here ("Thm 2.6.4") could not be independently verified and
-      has been retracted in favor of section-level reference).
-    * Boolos-Burgess-Jeffrey, *Computability and Logic* (5th ed.,
-      Cambridge UP, 2007) Ch. 16 §16.4 (Robinson Arithmetic) —
-      the Σ⁰₁-completeness of Robinson's Q is established within
-      this section.  The specific theorem-number citation that
-      previously appeared here ("Thm 16.4") conflated section
-      number with theorem number and has been retracted in favor
-      of section-level reference.
-    * Rogers, *Theory of Recursive Functions and Effective
-      Computability* (1967) Ch.~XII (Σ⁰₁-soundness of Q on Kleene's
-      T-predicate family).
+      (secondary, section-level only — no theorem-number label).
+    * Hájek-Pudlák, *Metamathematics of First-Order Arithmetic*
+      (Perspectives in Logic, Springer, 1998) Chapter I (numbered
+      theorem statement of Σ⁰₁-completeness of Robinson's Q) —
+      PRIMARY operative source for the Σ⁰₁-completeness fact.
+    * Smith, *An Introduction to Gödel's Theorems* (2nd ed.,
+      Cambridge UP, 2013) Ch 11 ("What Q can prove") — accessible
+      secondary source for Σ⁰₁-completeness of Q.
+    * Tarski-Mostowski-Robinson, *Undecidable Theories* (Studies
+      in Logic and the Foundations of Mathematics, North-Holland,
+      Amsterdam, 1953) — standard reference for `N ⊨ Q`, used
+      together with Σ⁰₁-completeness to obtain Σ⁰₁-soundness as a
+      one-line corollary.
     * Li, 2026, *What the Karpowicz Theorem Does Not Prove*,
       `\label{thm:undecidable}` proof construction.
+
+  Round-history trace (citation revisions, prior retractions) is the
+  canonical `attackHistory` field of `gap_Bridge_Q_DefExt_TextbookFacts`
+  in `EinsteinTest.Ledger`.
 -/
 
 /-- **Paper-novel encoding axiom (Category 3).**  The paper's adversarial
@@ -169,28 +190,22 @@ axiom Bridge_Tstar_e_Encoding (W : ObservationalWorld) [REAxiomatised W] :
     the following textbook facts hold:
 
     * (i) `qHe e ↔ Halt(e)` — Σ⁰₁-completeness of Robinson `Q`
-        (Boolos-Burgess-Jeffrey, *Computability and Logic* 5th ed.,
-        Cambridge UP, 2007, Ch. 16 §16.4 "Robinson Arithmetic") —
-        combined with Σ⁰₁-soundness of `Q` via the standard model `ℕ`
-        (Rogers, *Theory of Recursive Functions and Effective
-        Computability*, McGraw-Hill, 1967, Ch. XII).  NOTE: the
-        previous citation "Thm 16.4" conflated the section number
-        (§16.4) with a theorem number; the result is established
-        within §16.4 but the specific in-section theorem number could
-        not be independently verified, so the citation is by section.
+        (Hájek-Pudlák, *Metamathematics of First-Order Arithmetic*,
+        Perspectives in Logic, Springer, 1998, Chapter I, numbered
+        theorem statement; secondary textbook source: Smith,
+        *An Introduction to Gödel's Theorems*, 2nd ed., Cambridge UP,
+        2013, Ch 11 "What Q can prove") — combined with Σ⁰₁-soundness
+        of `Q`, which follows as a one-line corollary from `N ⊨ Q`
+        (Tarski-Mostowski-Robinson, *Undecidable Theories*, North-
+        Holland, Amsterdam, 1953) plus Σ⁰₁-completeness.
     * (ii) Conservativity outside `S*`:
         `S ≠ S* → (S ∈ π(T*_e) ↔ S ∈ π(T_0))` — conservativity of
         definitional extensions.  Primary citation: Shoenfield,
         *Mathematical Logic*, Addison-Wesley, 1967, §4.6 "Extensions
-        by definitions" (p. 57f) — classical statement with explicit
-        theorem-numbered proof.  See also Hodges, *A Shorter Model
+        by definitions" (p. 57f).  See also Hodges, *A Shorter Model
         Theory*, Cambridge UP, 1997, §2.6 (conservative-extension
-        material on p. 58 and surrounding discussion).  NOTE: the
-        previous citation "Hodges Thm 2.6.4" could not be
-        independently verified (Hodges' index lists conservative
-        extension at p. 58 but does not corroborate that specific
-        theorem-number label), so primary citation has been moved to
-        Shoenfield and the Hodges reference is by section.
+        material on p. 58 and surrounding discussion; section-level
+        reference only, no theorem-number label).
 
     The axiom is stated as a universal claim over any 4-tuple
     `(Sstar, qHe, T0_enc, Tstar_enc)` satisfying the paper-novel
@@ -202,9 +217,10 @@ axiom Bridge_Q_DefExt_TextbookFacts (W : ObservationalWorld) [REAxiomatised W]
     (T0_enc : W.Th) (Tstar_enc : Nat.Partrec.Code → W.Th)
     (h_iii : Sstar ∉ W.predict T0_enc)
     (h_iv : ∀ e, Sstar ∈ W.predict (Tstar_enc e) ↔ qHe e) :
-    -- (i) BBJ + Rogers
+    -- (i) Σ⁰₁-completeness: Hájek-Pudlák 1998 Ch I (or Smith 2013 Ch 11);
+    --     Σ⁰₁-soundness: N ⊨ Q (Tarski-Mostowski-Robinson 1953)
     (∀ e, qHe e ↔ (Nat.Partrec.Code.eval e 0).Dom) ∧
-    -- (ii) Hodges
+    -- (ii) Shoenfield 1967 §4.6 (primary), Hodges 1997 §2.6 (secondary)
     (∀ (e : Nat.Partrec.Code) (S : W.Obs),
       S ≠ Sstar → (S ∈ W.predict (Tstar_enc e) ↔ S ∈ W.predict T0_enc))
 
@@ -274,9 +290,12 @@ private lemma textbook_spec (W : ObservationalWorld) [REAxiomatised W] :
     (Bridge1b_T0 W) (Bridge1b_Tstar W) (Bridge_Encoding_Sstar_T0 W)
     (Bridge_Encoding_Sstar_Tstar W)
 
-/-- **Bridge 1a (Q-provability of H_e ↔ Halt; BBJ 2007 Ch. 16 §16.4 +
-    Rogers 1967 Ch.~XII).** Textbook clause (i); derived from
-    `Bridge_Q_DefExt_TextbookFacts`. -/
+/-- **Bridge 1a (Q-provability of H_e ↔ Halt; Hájek-Pudlák 1998
+    Ch I + Tarski-Mostowski-Robinson 1953).** Textbook clause (i);
+    derived from `Bridge_Q_DefExt_TextbookFacts`.  Σ⁰₁-completeness
+    from Hájek-Pudlák (or accessible secondary: Smith 2013 Ch 11);
+    Σ⁰₁-soundness as one-line corollary from N ⊨ Q (Tarski-Mostowski-
+    Robinson 1953 *Undecidable Theories*). -/
 lemma Bridge_Q_Sigma01_complete_sound
     (W : ObservationalWorld) [REAxiomatised W] :
     ∀ e, Q_proves_He W e ↔ (Nat.Partrec.Code.eval e 0).Dom :=
@@ -300,8 +319,10 @@ lemma Bridge_DefExt_Conservative
     `Bridge_Tstar_e_Encoding` supplies the encoding witnesses
     (Sstar, qHe, T0_enc, Tstar_enc) and the paper-novel properties
     (iii)+(iv); `Bridge_Q_DefExt_TextbookFacts` then yields the
-    textbook facts (i) Σ⁰₁-completeness/soundness and (ii)
-    conservativity outside `S*`.  The reduction
+    textbook facts (i) Σ⁰₁-completeness (Hájek-Pudlák 1998 Ch I /
+    Smith 2013 Ch 11) + Σ⁰₁-soundness via N ⊨ Q (Tarski-Mostowski-
+    Robinson 1953) and (ii) conservativity outside `S*` (Shoenfield
+    1967 §4.6 primary, Hodges 1997 §2.6 secondary).  The reduction
     `e ↦ (Bridge1b_Tstar W e, Bridge1b_T0 W)` pivots on the
     distinguished observable: the prediction sets agree off `S*`
     (Shoenfield 1967 §4.6 / Hodges 1997 §2.6), and they disagree on
@@ -454,9 +475,8 @@ theorem thm_undecidable_tarski_decidable :
   fun φ => ⟨RCFDecide φ, Bridge_Tarski_RCF_Correctness φ⟩
 
 /--
-  **Corollary~\ref{cor:no-universal}** (post-R6 honest restatement):
-  no `ComputablePred`-witnessing total Dist-decider exists on
-  r.e.-axiomatised classes extending `Q`.
+  **Corollary~\ref{cor:no-universal}**: no `ComputablePred`-witnessing
+  total Dist-decider exists on r.e.-axiomatised classes extending `Q`.
 
   Formal statement: composing Bridge 1 with the standard
   recursion-theoretic identification (a `ComputablePred`-witnessed
@@ -464,17 +484,16 @@ theorem thm_undecidable_tarski_decidable :
   the halting problem becomes decidable — contradicting
   `ComputablePred.halting_problem 0` from Mathlib.
 
-  *Lean v0.1 statement:* we expose the structural negation: there is
-  no `ComputablePred` for the predicate `e ↦ Dist(enc(e).1, enc(e).2)`
-  where `enc` is the Bridge-1 reduction.
+  We expose the structural negation: there is no `ComputablePred` for
+  the predicate `e ↦ Dist(enc(e).1, enc(e).2)` where `enc` is the
+  Bridge-1 reduction.
 
   Transfer to Einstein-Test verifiers is conditional on the super-
   family containing the r.e.-axiomatised adversarial sub-class.
 
-  *Proof sketch (formal Lean proof deferred to v0.2):*
-  Suppose for contradiction such a `ComputablePred` existed.  Bridge 1
-  gives `∀ e, Dist (enc e).1 (enc e).2 ↔ Halt e`, so the halting
-  predicate `fun e => (Nat.Partrec.Code.eval e 0).Dom` is
+  *Proof:* Suppose for contradiction such a `ComputablePred` existed.
+  Bridge 1 gives `∀ e, Dist (enc e).1 (enc e).2 ↔ Halt e`, so the
+  halting predicate `fun e => (Nat.Partrec.Code.eval e 0).Dom` is
   `ComputablePred`-equivalent to a `ComputablePred`, hence itself
   `ComputablePred`.  This contradicts `halting_problem 0` from
   `Mathlib.Computability.Halting`.  The Mathlib-level

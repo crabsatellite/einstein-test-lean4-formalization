@@ -22,6 +22,12 @@
     EinsteinTest/AxiomAudit.lean — prints axiom dependencies of every
     paper-level theorem. Expected: only `propext`, `Classical.choice`,
     `Quot.sound`, plus the explicitly declared `K_*` Kolmogorov bridges.
+
+  Gap ledger:
+    EinsteinTest/Ledger.lean — typed record of every axiom + BLOCKED
+    route + CLOSED top-level result, per `feedback_gap_ledger_in_lean4.md`.
+    Status taxonomy: gapOpen / gapPartial / gapBlocked / gapDeadEnd /
+    gapClosed / gapPaperNovel.  Canonical attack-history record.
 -/
 
 import EinsteinTest.Basic

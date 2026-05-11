@@ -17,7 +17,7 @@
   No (E) custom-scaffolding axioms (e.g. naked constants, abstract-
   type-inhabitation stipulations) are permitted.
 
-  Expected axiom dependencies per theorem (post-v0.4):
+  Expected axiom dependencies per theorem:
 
   * Theorem 1 (`thm_floor`), Theorem 5 (`thm_self_verification`),
     Theorem 4 (`thm_decomposition`), Corollary `cor_empirical_necessity`,
@@ -27,27 +27,32 @@
 
   * Theorem 2 (`thm_emission`):
     standard kernel + five literature-cited Kolmogorov bridges
-    (each a single existential statement; the previously-separate
-    naked constants `K_*_const` and `K_chainRule_slack` are now
-    `Classical.choose`-derived from these bundles and do not appear
-    as axioms; the v0.5 split decomposes the previously-bundled
-    chain rule (pair + single LHS) into pure single-step facts):
+    (each a single existential statement; the constants
+    `K_*_const` and `K_chainRule_slack` are `Classical.choose`-
+    derived from the existentials and do not appear as separate
+    axioms):
       `K_codingTheorem`     — Li-Vitányi, 3rd ed. (2008), Thm 4.3.4
+                              (conditional coding theorem) + Vitányi
+                              2013 (TCS 501, pp. 93–100, arXiv:1206.0983)
+                              for the explicit conditional-version proof
       `K_chainRule_pair`    — Li-Vitányi, 3rd ed. (2008), Thm 3.9.1
                               (pair-LHS form only; single-LHS form
-                              is now DERIVED via `K_pairNonDecrease`)
+                              is DERIVED via `K_pairNonDecrease`)
       `K_pairNonDecrease`   — Li-Vitányi, 3rd ed. (2008), §3.1
-                              (information non-decrease under pairing;
-                              v0.5 split out of the previous bundled
-                              chain rule)
-      `K_condMonotone`      — Li-Vitányi, 3rd ed. (2008), Thm 2.1.8
+                              (information non-decrease under pairing)
+      `K_condMonotone`      — Li-Vitányi, 3rd ed. (2008), §3.1 / §3.4
+                              (prefix-`K` analogue of plain-complexity
+                              Ch 2 result Thm 2.1.8; the Lean axiom is
+                              stated for prefix `K`, transfer to which
+                              proceeds via §3.1/§3.4 by relativizing
+                              the universal prefix machine)
       `K_descLength`        — Li-Vitányi, 3rd ed. (2008), §2.1
                               (immediate consequence of the Invariance
                               Theorem Thm 2.1.1 via the literal-output
-                              universal program; the v0.5 hedge
-                              acknowledges the earlier "Thm 2.1.1"
-                              citation conflated the invariance result
-                              with its description-length corollary)
+                              universal program; REQUIRES descLen y to
+                              include self-delimiting overhead — see
+                              axiom docstring; without prefix-coding the
+                              textbook bound carries an extra 2log|y| term)
 
   * Corollary `cor_rare`, Remark `rem_emission_not_impossible`:
     standard kernel only (the KC bridges are scoped to `thm_emission`
@@ -62,10 +67,14 @@
                                           (Li 2026 \label{thm:undecidable}
                                           construction; clauses (iii)+(iv))
       `Bridge_Q_DefExt_TextbookFacts`   — Category 1 literature
-                                          (BBJ 2007 Ch. 16 §16.4 +
-                                          Rogers 1967 Ch.~XII +
-                                          Shoenfield 1967 §4.6 with
-                                          Hodges 1997 §2.6 as secondary)
+                                          (Σ⁰₁-completeness of Q:
+                                          Hájek-Pudlák 1998 Ch I,
+                                          primary; Smith 2013 Ch 11,
+                                          secondary; Σ⁰₁-soundness via
+                                          N ⊨ Q: Tarski-Mostowski-
+                                          Robinson 1953; conservativity:
+                                          Shoenfield 1967 §4.6 primary,
+                                          Hodges 1997 §2.6 secondary)
     Every axiom is exactly one of {literature theorem, standard
     library, paper-novel claim}; no composite axioms remain.
     The derived accessors `DistinguishedObs`, `Q_proves_He`,
@@ -78,45 +87,53 @@
 
   * `thm_undecidable_tarski_decidable`:
     standard kernel + `Bridge_Tarski_RCF_Correctness` (single
-    literature citation: Tarski 1948 RAND R-109).  The previous v0.2
-    statement (`∃ b, RCFDecide φ = b`) was trivial by `Bool`-typing;
-    the v0.3 statement (`∃ b : Bool, b = true ↔ RCFSatisfies φ`)
-    captures the substantive content of Tarski's decision procedure.
+    literature citation: Tarski 1948 RAND R-109).  The statement
+    `∃ b : Bool, b = true ↔ RCFSatisfies φ` captures the substantive
+    content of Tarski's decision procedure (a trivial
+    `∃ b, RCFDecide φ = b` would be vacuous by `Bool`-typing).
 
   * `thm_undecidable_sigma02_upper`:
     standard kernel only / no axioms.
 
   Any axiom outside this list is a RED FLAG — investigate.
 
-  Trust audit summary (8 axioms total post-v0.5; every axiom PURE
-  single-category and citation-tightened):
+  Trust audit summary (8 axioms total; every axiom PURE single-category
+  and citation-precise):
   ┌─────────────────────────────────┬──────────┬─────────────────────────────────────────────────────────┐
   │ Axiom                           │ Category │ Citation                                                │
   ├─────────────────────────────────┼──────────┼─────────────────────────────────────────────────────────┤
-  │ K_codingTheorem                 │ 1        │ Li-Vitányi, 3rd ed. (2008), Thm 4.3.4                   │
+  │ K_codingTheorem                 │ 1        │ Li-Vitányi, 3rd ed. (2008), Thm 4.3.4 (conditional      │
+  │                                 │          │ coding theorem) + Vitányi, *TCS* 501 (2013), 93–100,    │
+  │                                 │          │ arXiv:1206.0983 (explicit conditional-version proof —   │
+  │                                 │          │ conditional convention was non-standard prior to 2013)  │
   │ K_chainRule_pair                │ 1        │ Li-Vitányi, 3rd ed. (2008), Thm 3.9.1                   │
-  │                                 │          │ (pair-LHS form only; v0.5 split)                        │
+  │                                 │          │ (pair-LHS form only)                                    │
   │ K_pairNonDecrease               │ 1        │ Li-Vitányi, 3rd ed. (2008), §3.1                        │
-  │                                 │          │ (information non-decrease under pairing; v0.5 split     │
-  │                                 │          │ out of bundled chain rule so single-LHS variant becomes │
-  │                                 │          │ a derived lemma — see K_chainRule_single_apply)         │
-  │ K_condMonotone                  │ 1        │ Li-Vitányi, 3rd ed. (2008), Thm 2.1.8                   │
+  │                                 │          │ (information non-decrease under pairing; single-LHS     │
+  │                                 │          │ chain-rule variant is a derived lemma                   │
+  │                                 │          │ `K_chainRule_single_apply`)                             │
+  │ K_condMonotone                  │ 1        │ Li-Vitányi, 3rd ed. (2008), §3.1 / §3.4 (prefix-`K`     │
+  │                                 │          │ analogue of plain-complexity Ch 2 Thm 2.1.8; prior      │
+  │                                 │          │ "Thm 2.1.8" was for plain `C`, Lean axiom is for prefix │
+  │                                 │          │ `K`; result transfers by relativizing universal prefix  │
+  │                                 │          │ machine)                                                │
   │ K_descLength                    │ 1        │ Li-Vitányi, 3rd ed. (2008), §2.1                        │
   │                                 │          │ (immediate consequence of Thm 2.1.1 Invariance via the  │
-  │                                 │          │ literal-output universal program; v0.5 hedge replaces   │
-  │                                 │          │ the prior "Thm 2.1.1" label, which conflated invariance │
-  │                                 │          │ K_1-K_2 ≤ c with description-length K(y|z) ≤ |y|+c)     │
+  │                                 │          │ literal-output universal program.  REQUIRES descLen y   │
+  │                                 │          │ to include self-delimiting overhead — without it, the   │
+  │                                 │          │ textbook bound is K(y|z) ≤ |y| + 2log|y| + c)           │
   │ Bridge_Tarski_RCF_Correctness   │ 1        │ Tarski 1948 RAND R-109                                  │
-  │ Bridge_Q_DefExt_TextbookFacts   │ 1        │ BBJ 2007 Ch. 16 §16.4 + Rogers 1967 Ch.~XII +           │
-  │                                 │          │ Shoenfield 1967 §4.6 (primary) / Hodges 1997 §2.6       │
-  │                                 │          │ (secondary).  v0.5 hedge: prior "BBJ Thm 16.4"          │
-  │                                 │          │ conflated section §16.4 with a theorem number; prior    │
-  │                                 │          │ "Hodges Thm 2.6.4" could not be independently verified  │
-  │                                 │          │ (index lists conservative extension at p. 58 only) so   │
-  │                                 │          │ primary citation moved to Shoenfield 1967 §4.6 which is │
-  │                                 │          │ theorem-numbered in the source. Textbook conclusions    │
-  │                                 │          │ about ANY structure satisfying paper-novel encoding     │
-  │                                 │          │ clauses (iii)+(iv))                                     │
+  │ Bridge_Q_DefExt_TextbookFacts   │ 1        │ Σ⁰₁-completeness of Q: Hájek-Pudlák 1998 (Springer,     │
+  │                                 │          │ Perspectives in Logic) Ch I, PRIMARY; Smith 2013        │
+  │                                 │          │ (Cambridge, *An Intro to Gödel's Theorems* 2nd ed.) Ch  │
+  │                                 │          │ 11 "What Q can prove", SECONDARY.  Σ⁰₁-soundness via    │
+  │                                 │          │ N ⊨ Q: Tarski-Mostowski-Robinson 1953 *Undecidable      │
+  │                                 │          │ Theories* (North-Holland).  Conservativity: Shoenfield  │
+  │                                 │          │ 1967 §4.6 PRIMARY (theorem-numbered) + Hodges 1997 §2.6 │
+  │                                 │          │ secondary.  Round-history (prior retracted citations    │
+  │                                 │          │ for these facts) lives in                               │
+  │                                 │          │ `gap_Bridge_Q_DefExt_TextbookFacts.attackHistory`       │
+  │                                 │          │ inside `EinsteinTest.Ledger`.                           │
   │ Bridge_Tstar_e_Encoding         │ 3        │ Li 2026 \label{thm:undecidable} construction (paper-    │
   │                                 │          │ novel encoding clauses (iii) S*∉π(T_0) + (iv) S*∈π(T*_e)│
   │                                 │          │ ↔ qHe(e); abstract realization of T*_e := Q ∪ {S*↔H_e}) │
