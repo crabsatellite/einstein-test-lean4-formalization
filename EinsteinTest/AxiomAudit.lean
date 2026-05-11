@@ -68,11 +68,15 @@
                                           construction; clauses (iii)+(iv))
       `Bridge_Q_DefExt_TextbookFacts`   — Category 1 literature
                                           (Σ⁰₁-completeness of Q:
-                                          Hájek-Pudlák 1998 Ch I,
-                                          primary; Smith 2013 Ch 11,
-                                          secondary; Σ⁰₁-soundness via
-                                          N ⊨ Q: Tarski-Mostowski-
-                                          Robinson 1953; conservativity:
+                                          Smith 2013 Ch 11
+                                          §"Q is Σ₁-complete",
+                                          primary; Hájek-Pudlák 1998
+                                          Preliminaries §(c)
+                                          pp. 20-26, secondary;
+                                          Σ⁰₁-soundness via
+                                          N ⊨ Q: TMR 1953 Ch II +
+                                          Smith 2013 §10.1-10.2;
+                                          conservativity:
                                           Shoenfield 1967 §4.6 primary,
                                           Hodges 1997 §2.6 secondary)
     Every axiom is exactly one of {literature theorem, standard
@@ -123,15 +127,25 @@
   │                                 │          │ to include self-delimiting overhead — without it, the   │
   │                                 │          │ textbook bound is K(y|z) ≤ |y| + 2log|y| + c)           │
   │ Bridge_Tarski_RCF_Correctness   │ 1        │ Tarski 1948 RAND R-109                                  │
-  │ Bridge_Q_DefExt_TextbookFacts   │ 1        │ Σ⁰₁-completeness of Q: Hájek-Pudlák 1998 (Springer,     │
-  │                                 │          │ Perspectives in Logic) Ch I, PRIMARY; Smith 2013        │
-  │                                 │          │ (Cambridge, *An Intro to Gödel's Theorems* 2nd ed.) Ch  │
-  │                                 │          │ 11 "What Q can prove", SECONDARY.  Σ⁰₁-soundness via    │
+  │ Bridge_Q_DefExt_TextbookFacts   │ 1        │ Σ⁰₁-completeness of Q: Smith 2013 (Cambridge, *An Intro │
+  │                                 │          │ to Gödel's Theorems* 2nd ed.) Ch 11 "What Q can prove", │
+  │                                 │          │ §"Q is Σ₁-complete", PRIMARY (chapter title + section   │
+  │                                 │          │ locator verified by direct CUP frontmatter match;       │
+  │                                 │          │ in-chapter theorem number unverified, so cited at       │
+  │                                 │          │ section level only); Hájek-Pudlák 1998 (Springer,       │
+  │                                 │          │ Perspectives in Logic) Preliminaries §(c) "Beginning    │
+  │                                 │          │ Arithmetization of Metamathematics", pp. 20-26,         │
+  │                                 │          │ SECONDARY (foundational preliminaries-level fact, NOT   │
+  │                                 │          │ numbered theorem; HP uses two-level Chapter.Section     │
+  │                                 │          │ numbering — there is no §1.4).  Σ⁰₁-soundness via       │
   │                                 │          │ N ⊨ Q: Tarski-Mostowski-Robinson 1953 *Undecidable      │
-  │                                 │          │ Theories* (North-Holland).  Conservativity: Shoenfield  │
-  │                                 │          │ 1967 §4.6 PRIMARY (theorem-numbered) + Hodges 1997 §2.6 │
-  │                                 │          │ secondary.  Round-history (prior retracted citations    │
-  │                                 │          │ for these facts) lives in                               │
+  │                                 │          │ Theories* (North-Holland) Ch II for Q's axiomatization  │
+  │                                 │          │ + Smith 2013 §10.1-10.2 for axiom-by-axiom verification │
+  │                                 │          │ that ℕ satisfies each of Q's seven axioms.              │
+  │                                 │          │ Conservativity: Shoenfield 1967 §4.6 PRIMARY            │
+  │                                 │          │ (theorem-numbered) + Hodges 1997 §2.6 secondary.        │
+  │                                 │          │ Round-history (prior retracted citations for these      │
+  │                                 │          │ facts) lives in                                         │
   │                                 │          │ `gap_Bridge_Q_DefExt_TextbookFacts.attackHistory`       │
   │                                 │          │ inside `EinsteinTest.Ledger`.                           │
   │ Bridge_Tstar_e_Encoding         │ 3        │ Li 2026 \label{thm:undecidable} construction (paper-    │
@@ -150,9 +164,13 @@
 
     * `Bridge_Q_DefExt_TextbookFacts` (PURE Category 1): a UNIVERSAL
       claim that for any 4-tuple satisfying the encoding clauses
-      (iii)+(iv), the textbook facts (i) `qHe e ↔ Halt(e)` (BBJ +
-      Rogers) and (ii) conservativity outside `S*` (Hodges) hold.
-      No paper-novel content; pure textbook conclusions.
+      (iii)+(iv), the textbook facts (i) `qHe e ↔ Halt(e)` (Smith
+      2013 Ch 11 primary, Hájek-Pudlák 1998 Preliminaries §(c)
+      secondary, for Σ⁰₁-completeness; TMR 1953 Ch II + Smith 2013
+      §10.1-10.2 for N ⊨ Q yielding Σ⁰₁-soundness) and (ii)
+      conservativity outside `S*` (Shoenfield 1967 §4.6 primary +
+      Hodges 1997 §2.6 secondary) hold.  No paper-novel content;
+      pure textbook conclusions.
 
   Every axiom in the project is now exactly one of {literature
   theorem, standard library, paper-novel claim} — no composite

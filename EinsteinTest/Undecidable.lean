@@ -21,19 +21,29 @@
 
   *Note on Q-naming:* "Robinson's Q" in this file refers to the
   standard finitely-axiomatized fragment of Peano arithmetic per
-  Hájek-Pudlák 1998 (Springer, *Metamathematics of First-Order
-  Arithmetic*) Chapter I (Σ₁-completeness of Q as a numbered theorem)
-  and Smith 2013 (Cambridge, *An Introduction to Gödel's Theorems*,
-  2nd ed.) Ch 11 ("What Q can prove").  We deliberately avoid citing
-  Boolos-Burgess-Jeffrey *Computability and Logic* (5th ed., 2007) as
-  the operative source because BBJ use a DIFFERENT naming convention:
-  BBJ's "Q" is Shoenfield-style minimal arithmetic (§16.2) and BBJ's
-  "R" is what they label as "Robinson arithmetic" (§16.4); these are
-  distinct theories (see the Wikipedia article on Robinson arithmetic
-  for the explicit comparison: "Robinson arithmetic and the minimal
-  arithmetic discussed in Boolos, Burgess and Jeffrey are two distinct
-  theories").  BBJ may still be cited as a secondary textbook source
-  with this naming caveat made explicit.
+  Smith 2013 (Cambridge, *An Introduction to Gödel's Theorems*,
+  2nd ed.) Ch 11 ("What Q can prove", §"Q is Σ₁-complete") as the
+  PRIMARY operative source (chapter title and section locator
+  verified by direct CUP frontmatter match; the in-chapter theorem
+  number is unverified, so we cite at the section level only).
+  Secondary: Hájek-Pudlák 1998 (Springer, *Metamathematics of
+  First-Order Arithmetic*) Preliminaries §(c) "Beginning
+  Arithmetization of Metamathematics" (pp. 20-26), where Q is
+  introduced and Σ₁-completeness is stated as a foundational
+  preliminaries-level fact (NOT as a numbered theorem; HP uses
+  two-level Chapter.Section numbering with letter-labelled
+  subsections, and the relativized Σ_n/Π_n hierarchy lives at
+  Ch I §2(d) p. 81, which is a DIFFERENT location).  We deliberately
+  avoid citing Boolos-Burgess-Jeffrey *Computability and Logic*
+  (5th ed., 2007) as the operative source because BBJ use a
+  DIFFERENT naming convention: BBJ's "Q" is Shoenfield-style minimal
+  arithmetic (§16.2) and BBJ's "R" is what they label as "Robinson
+  arithmetic" (§16.4); these are distinct theories (see the
+  Wikipedia article on Robinson arithmetic for the explicit
+  comparison: "Robinson arithmetic and the minimal arithmetic
+  discussed in Boolos, Burgess and Jeffrey are two distinct
+  theories").  BBJ may still be cited as a secondary textbook
+  source with this naming caveat made explicit.
 
   *Important caveat (Remark~\ref{rem:adversarial-not-E3}):* the
   adversarial `T*_e` is by construction an explicit definitional
@@ -100,11 +110,14 @@ def Dist (W : ObservationalWorld) (T1 T2 : W.Th) : Prop :=
 
   Per the trust policy (every axiom must be PURE single-category), the
   recursion-theoretic content is split into two independent axioms
-  (textbook citations: Σ⁰₁-completeness of Robinson Q from Hájek-Pudlák
-  1998 Ch I / Smith 2013 Ch 11; Σ⁰₁-soundness via N ⊨ Q from
-  Tarski-Mostowski-Robinson 1953; conservativity of definitional
-  extension from Shoenfield 1967 §4.6 / Hodges 1997 §2.6, on top of
-  two paper-novel encoding stipulations for the construction
+  (textbook citations: Σ⁰₁-completeness of Robinson Q from Smith 2013
+  Ch 11 (primary) / Hájek-Pudlák 1998 Preliminaries §(c) (secondary);
+  Σ⁰₁-soundness via N ⊨ Q from Tarski-Mostowski-Robinson 1953 Ch II
+  (axiomatization) together with Smith 2013 §10.1-10.2
+  (axiom-by-axiom verification that ℕ satisfies each Q-axiom);
+  conservativity of definitional extension from Shoenfield 1967 §4.6
+  (primary) / Hodges 1997 §2.6 (secondary), on top of two paper-novel
+  encoding stipulations for the construction
   `T*_e := Q ∪ {S* ↔ H_e}`):
 
     * `Bridge_Tstar_e_Encoding` — PURE Category 3 paper-novel.  Witnesses
@@ -116,13 +129,16 @@ def Dist (W : ObservationalWorld) (T1 T2 : W.Th) : Prop :=
     * `Bridge_Q_DefExt_TextbookFacts` — PURE Category 1 literature.
       A UNIVERSAL claim: for ANY 4-tuple (Sstar, qHe, T0_enc, Tstar_enc)
       satisfying the paper's encoding properties (iii)+(iv), the
-      textbook facts (i) `qHe e ↔ Halt(e)` (Hájek-Pudlák 1998 Ch I /
-      Smith 2013 Ch 11 for Σ⁰₁-completeness, Tarski-Mostowski-Robinson
-      1953 for N ⊨ Q yielding Σ⁰₁-soundness) and (ii) conservativity
-      outside `S*` (Shoenfield 1967 §4.6, primary; Hodges 1997 §2.6,
-      secondary) hold.  Contains no paper-novel content; pure textbook
-      conclusions about any structure with the paper's encoding
-      properties.
+      textbook facts (i) `qHe e ↔ Halt(e)` (Smith 2013 Ch 11,
+      §"Q is Σ₁-complete", primary; Hájek-Pudlák 1998 Preliminaries
+      §(c) "Beginning Arithmetization of Metamathematics" (pp. 20-26),
+      secondary, for Σ⁰₁-completeness; TMR 1953 Ch II for Q's
+      axiomatization plus Smith 2013 §10.1-10.2 for axiom-by-axiom
+      verification of N ⊨ Q yielding Σ⁰₁-soundness as a one-line
+      corollary) and (ii) conservativity outside `S*` (Shoenfield
+      1967 §4.6, primary; Hodges 1997 §2.6, secondary) hold.
+      Contains no paper-novel content; pure textbook conclusions
+      about any structure with the paper's encoding properties.
 
   Downstream theorems (`Bridge_Halt_Iff_Dist`, `thm_undecidable_sigma01_hard`,
   `cor_no_universal`) destructure both axioms and chain the
@@ -137,18 +153,31 @@ def Dist (W : ObservationalWorld) (T1 T2 : W.Th) : Prop :=
       (translations / definitional extensions); conservative-
       extension material on p. 58 and surrounding discussion
       (secondary, section-level only — no theorem-number label).
-    * Hájek-Pudlák, *Metamathematics of First-Order Arithmetic*
-      (Perspectives in Logic, Springer, 1998) Chapter I (numbered
-      theorem statement of Σ⁰₁-completeness of Robinson's Q) —
-      PRIMARY operative source for the Σ⁰₁-completeness fact.
     * Smith, *An Introduction to Gödel's Theorems* (2nd ed.,
-      Cambridge UP, 2013) Ch 11 ("What Q can prove") — accessible
-      secondary source for Σ⁰₁-completeness of Q.
+      Cambridge UP, 2013) Ch 11 ("What Q can prove", §"Q is
+      Σ₁-complete") — PRIMARY operative source for Σ⁰₁-completeness
+      of Q (chapter title + section locator verified by direct CUP
+      frontmatter match; in-chapter theorem number unverified, so
+      cited at section level only).  Also §10.1-10.2 (axiom-by-axiom
+      verification that ℕ satisfies each of Q's seven axioms),
+      supplying the textbook witness for N ⊨ Q used in deriving
+      Σ⁰₁-soundness.
+    * Hájek-Pudlák, *Metamathematics of First-Order Arithmetic*
+      (Perspectives in Logic, Springer, 1998) Preliminaries §(c)
+      "Beginning Arithmetization of Metamathematics" (pp. 20-26),
+      where Q is introduced and Σ⁰₁-completeness is stated as a
+      foundational preliminaries-level fact (NOT as a numbered
+      theorem; HP uses two-level Chapter.Section numbering with
+      letter-labelled subsections — there is no §1.4) —
+      SECONDARY source for Σ⁰₁-completeness.
     * Tarski-Mostowski-Robinson, *Undecidable Theories* (Studies
       in Logic and the Foundations of Mathematics, North-Holland,
-      Amsterdam, 1953) — standard reference for `N ⊨ Q`, used
-      together with Σ⁰₁-completeness to obtain Σ⁰₁-soundness as a
-      one-line corollary.
+      Amsterdam, 1953) Ch II — standard reference for the
+      axiomatization of Q (used together with Smith 2013 §10.1-10.2
+      for the axiom-by-axiom verification of N ⊨ Q, which yields
+      Σ⁰₁-soundness as a one-line corollary; N ⊨ Q is not stated
+      in TMR as a numbered theorem — it is immediate-by-construction
+      from the syntactic axiomatization).
     * Li, 2026, *What the Karpowicz Theorem Does Not Prove*,
       `\label{thm:undecidable}` proof construction.
 
@@ -190,14 +219,26 @@ axiom Bridge_Tstar_e_Encoding (W : ObservationalWorld) [REAxiomatised W] :
     the following textbook facts hold:
 
     * (i) `qHe e ↔ Halt(e)` — Σ⁰₁-completeness of Robinson `Q`
-        (Hájek-Pudlák, *Metamathematics of First-Order Arithmetic*,
-        Perspectives in Logic, Springer, 1998, Chapter I, numbered
-        theorem statement; secondary textbook source: Smith,
-        *An Introduction to Gödel's Theorems*, 2nd ed., Cambridge UP,
-        2013, Ch 11 "What Q can prove") — combined with Σ⁰₁-soundness
+        (Smith, *An Introduction to Gödel's Theorems*, 2nd ed.,
+        Cambridge UP, 2013, Ch 11 "What Q can prove", §"Q is
+        Σ₁-complete" — PRIMARY; chapter title and section locator
+        verified by direct CUP frontmatter match, in-chapter theorem
+        number unverified so cited at section level only; secondary
+        textbook source: Hájek-Pudlák, *Metamathematics of
+        First-Order Arithmetic*, Perspectives in Logic, Springer,
+        1998, Preliminaries §(c) "Beginning Arithmetization of
+        Metamathematics", pp. 20-26, where Q is introduced and
+        Σ⁰₁-completeness is stated as a foundational preliminaries-
+        level fact, NOT as a numbered theorem — HP uses two-level
+        Chapter.Section numbering with letter-labelled subsections,
+        and the relativized Σ_n/Π_n hierarchy lives at Ch I §2(d)
+        p. 81, a DIFFERENT location) — combined with Σ⁰₁-soundness
         of `Q`, which follows as a one-line corollary from `N ⊨ Q`
         (Tarski-Mostowski-Robinson, *Undecidable Theories*, North-
-        Holland, Amsterdam, 1953) plus Σ⁰₁-completeness.
+        Holland, Amsterdam, 1953, Ch II, for Q's axiomatization;
+        Smith 2013 §10.1-10.2 for the axiom-by-axiom verification
+        that ℕ satisfies each of Q's seven axioms — TMR does not
+        state N ⊨ Q as a numbered theorem) plus Σ⁰₁-completeness.
     * (ii) Conservativity outside `S*`:
         `S ≠ S* → (S ∈ π(T*_e) ↔ S ∈ π(T_0))` — conservativity of
         definitional extensions.  Primary citation: Shoenfield,
@@ -217,8 +258,9 @@ axiom Bridge_Q_DefExt_TextbookFacts (W : ObservationalWorld) [REAxiomatised W]
     (T0_enc : W.Th) (Tstar_enc : Nat.Partrec.Code → W.Th)
     (h_iii : Sstar ∉ W.predict T0_enc)
     (h_iv : ∀ e, Sstar ∈ W.predict (Tstar_enc e) ↔ qHe e) :
-    -- (i) Σ⁰₁-completeness: Hájek-Pudlák 1998 Ch I (or Smith 2013 Ch 11);
-    --     Σ⁰₁-soundness: N ⊨ Q (Tarski-Mostowski-Robinson 1953)
+    -- (i) Σ⁰₁-completeness: Smith 2013 Ch 11 §"Q is Σ₁-complete" primary,
+    --     Hájek-Pudlák 1998 Preliminaries §(c) pp. 20-26 secondary;
+    --     Σ⁰₁-soundness: TMR 1953 Ch II + Smith 2013 §10.1-10.2 for N ⊨ Q
     (∀ e, qHe e ↔ (Nat.Partrec.Code.eval e 0).Dom) ∧
     -- (ii) Shoenfield 1967 §4.6 (primary), Hodges 1997 §2.6 (secondary)
     (∀ (e : Nat.Partrec.Code) (S : W.Obs),
@@ -290,12 +332,20 @@ private lemma textbook_spec (W : ObservationalWorld) [REAxiomatised W] :
     (Bridge1b_T0 W) (Bridge1b_Tstar W) (Bridge_Encoding_Sstar_T0 W)
     (Bridge_Encoding_Sstar_Tstar W)
 
-/-- **Bridge 1a (Q-provability of H_e ↔ Halt; Hájek-Pudlák 1998
-    Ch I + Tarski-Mostowski-Robinson 1953).** Textbook clause (i);
-    derived from `Bridge_Q_DefExt_TextbookFacts`.  Σ⁰₁-completeness
-    from Hájek-Pudlák (or accessible secondary: Smith 2013 Ch 11);
-    Σ⁰₁-soundness as one-line corollary from N ⊨ Q (Tarski-Mostowski-
-    Robinson 1953 *Undecidable Theories*). -/
+/-- **Bridge 1a (Q-provability of H_e ↔ Halt; Smith 2013 Ch 11 primary
+    + Hájek-Pudlák 1998 Preliminaries §(c) secondary, for Σ⁰₁-
+    completeness; TMR 1953 Ch II + Smith 2013 §10.1-10.2, for N ⊨ Q
+    yielding Σ⁰₁-soundness).** Textbook clause (i); derived from
+    `Bridge_Q_DefExt_TextbookFacts`.  Σ⁰₁-completeness from Smith 2013
+    Ch 11 §"Q is Σ₁-complete" (primary; chapter title and section
+    locator verified, in-chapter theorem number unverified so cited
+    at section level only) with secondary Hájek-Pudlák 1998
+    Preliminaries §(c) pp. 20-26 (foundational preliminaries-level
+    fact, not numbered theorem; HP uses two-level numbering — there
+    is no §1.4); Σ⁰₁-soundness as one-line corollary from N ⊨ Q
+    (Tarski-Mostowski-Robinson 1953 *Undecidable Theories* Ch II for
+    Q's axiomatization plus Smith 2013 §10.1-10.2 for axiom-by-axiom
+    verification of N ⊨ Q). -/
 lemma Bridge_Q_Sigma01_complete_sound
     (W : ObservationalWorld) [REAxiomatised W] :
     ∀ e, Q_proves_He W e ↔ (Nat.Partrec.Code.eval e 0).Dom :=
@@ -319,10 +369,12 @@ lemma Bridge_DefExt_Conservative
     `Bridge_Tstar_e_Encoding` supplies the encoding witnesses
     (Sstar, qHe, T0_enc, Tstar_enc) and the paper-novel properties
     (iii)+(iv); `Bridge_Q_DefExt_TextbookFacts` then yields the
-    textbook facts (i) Σ⁰₁-completeness (Hájek-Pudlák 1998 Ch I /
-    Smith 2013 Ch 11) + Σ⁰₁-soundness via N ⊨ Q (Tarski-Mostowski-
-    Robinson 1953) and (ii) conservativity outside `S*` (Shoenfield
-    1967 §4.6 primary, Hodges 1997 §2.6 secondary).  The reduction
+    textbook facts (i) Σ⁰₁-completeness (Smith 2013 Ch 11 §"Q is
+    Σ₁-complete", primary; Hájek-Pudlák 1998 Preliminaries §(c)
+    pp. 20-26, secondary) + Σ⁰₁-soundness via N ⊨ Q
+    (Tarski-Mostowski-Robinson 1953 Ch II + Smith 2013 §10.1-10.2)
+    and (ii) conservativity outside `S*` (Shoenfield 1967 §4.6
+    primary, Hodges 1997 §2.6 secondary).  The reduction
     `e ↦ (Bridge1b_Tstar W e, Bridge1b_T0 W)` pivots on the
     distinguished observable: the prediction sets agree off `S*`
     (Shoenfield 1967 §4.6 / Hodges 1997 §2.6), and they disagree on

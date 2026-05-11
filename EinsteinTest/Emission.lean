@@ -116,18 +116,48 @@ notation:max "K[" x "|" y "]" => Kcond x y
 opaque descLen : KObj → ℝ
 
 /-- *Probability-mass predicate* `μAssignsAtLeast μDesc x k`:
-    the computable prefix-distribution encoded by `μDesc` assigns
-    probability at least `2^{-k}` to `x`. Carries the
-    Li-Vitányi, 3rd ed. (2008), Thm 4.3.4 hypothesis. -/
+    the conditional semi-measure encoded by `μDesc` assigns
+    conditional probability at least `2^{-k}` to `x`.
+
+    *Vitányi Definition 1 convention (commitment).*  Here `μDesc`
+    encodes a lower-semicomputable conditional semi-measure
+    `m(·|·)` satisfying (a) `Σ_x m(x|y) ≤ 1` for every `y`, (b)
+    lower-semicomputability uniformly in `(x, y)`, and (c)
+    multiplicative universality among lower-semicomputable
+    conditional semi-measures.  Concretely, `μAssignsAtLeast μDesc x k`
+    holds iff `m(x|y) ≥ 2^{-k}` where `(x, y)` are the conditioning
+    pair encoded into `μDesc` (Vitányi, *Theoretical Computer
+    Science* 501 (2013), 93–100, Definition 1).  We deliberately
+    do NOT use the classical quotient `m(x,y) / Σ_z m(z,y)`:
+    Vitányi 2013 Theorem 2 shows that the conditional coding
+    theorem `K(x|y) ≤ -log m(x|y) + O(1)` FAILS under that
+    convention.  The Definition-1 convention is mandatory for
+    the conditional coding theorem `K_codingTheorem` below to hold;
+    every use of `μAssignsAtLeast` in this file presupposes it. -/
 opaque μAssignsAtLeast : KObj → KObj → ℝ → Prop
 
 /-- **Bridge 1 (Conditional coding theorem; Li-Vitányi, 3rd ed. (2008),
-    Thm 4.3.4; explicit conditional-version proof in Vitányi 2013).**
-    There exists an additive constant `c` (depending only on the
-    universal prefix machine, not on `(x, μDesc, k)`) such that for
-    every computable distribution `μ` (encoded by `μDesc`) assigning
-    `x` probability `≥ 2^{-k}`, the conditional Kolmogorov complexity
-    is bounded by `k + c`.
+    Thm 4.3.4; explicit conditional-version proof in Vitányi 2013
+    under the Vitányi-Definition-1 conditional convention).**
+    There exists a universal additive constant `c` (depending only on
+    the universal prefix machine, not on `(x, μDesc, k)`) such that
+    `K(x | μDesc) ≤ k + c` whenever `μDesc` encodes a
+    Vitányi-Definition-1 conditional lower-semicomputable
+    semi-measure `m(·|·)` (i.e. `Σ_x m(x|y) ≤ 1`, lower-semicomputable
+    uniformly in `(x, y)`, multiplicatively universal) and the
+    encoded `m` assigns `m(x|y) ≥ 2^{-k}` (captured here by
+    `μAssignsAtLeast μDesc x k`).
+
+    *Critical convention note.*  The bound `K(x|y) ≤ -log m(x|y) + O(1)`
+    is proved in Vitányi 2013 (Theorem 4) ONLY under Definition 1
+    (lower-semicomputable conditional semi-measure with
+    `Σ_x m(x|y) ≤ 1` and multiplicative universality), NOT under
+    the classical quotient `m(x,y) / Σ_z m(z,y)`.  Vitányi 2013
+    Theorem 2 explicitly shows that the conditional coding theorem
+    FAILS under the classical-quotient convention.  This Lean axiom
+    is committed to the Vitányi Definition 1 convention as encoded
+    by `μAssignsAtLeast` (see its docstring); under the classical
+    quotient the axiom would be unsound.
 
     *Citation:* Li & Vitányi, *An Introduction to Kolmogorov Complexity
     and Its Applications* (3rd ed., 2008), Theorem 4.3.4 (conditional
@@ -135,7 +165,7 @@ opaque μAssignsAtLeast : KObj → KObj → ℝ → Prop
     Thm 4.3.3; the conditional version (Thm 4.3.4) was non-standard
     in the literature prior to Vitányi, *Theoretical Computer Science*
     **501** (2013), 93–100 (arXiv:1206.0983), which supplies the
-    explicit conditional-version proof under the standard convention.
+    explicit conditional-version proof (Theorem 4) under Definition 1.
     Cited here as the operative source for the conditional bound. -/
 axiom K_codingTheorem :
     ∃ c : ℝ, ∀ (x μDesc : KObj) (k : ℝ),

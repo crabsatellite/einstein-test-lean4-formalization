@@ -60,15 +60,20 @@ structure GapEntry where
 -/
 
 /-- `K_codingTheorem` — conditional coding theorem.  Universal additive
-    constant `c` for `K(x|y) ≤ k + c` when `μ(x|y) ≥ 2^(-k)`.  Only the
-    upper-bound direction. -/
+    constant `c` for `K(x|y) ≤ k + c` when `μ(x|y) ≥ 2^(-k)` under
+    Vitányi-Definition-1 conditional semi-measure convention.  Only
+    the upper-bound direction. -/
 def gap_K_codingTheorem : GapEntry := {
   name := "K_codingTheorem"
   status := GapStatus.gapOpen
   paperSource :=
     "Li-Vitányi 3rd ed. (2008) Thm 4.3.4 (conditional coding theorem); " ++
     "Vitányi, *Theoretical Computer Science* 501 (2013), 93–100 " ++
-    "(arXiv:1206.0983) for the explicit conditional-version proof"
+    "(arXiv:1206.0983), Theorem 4 under Definition 1 (lower-semicomputable " ++
+    "conditional semi-measure with Σ_x m(x|y) ≤ 1 + multiplicative " ++
+    "universality), for the explicit conditional-version proof.  The " ++
+    "classical quotient m(x,y)/Σ_z m(z,y) convention does NOT support the " ++
+    "conditional coding theorem (Vitányi 2013 Theorem 2 shows it FAILS)"
   attackHistory := [
     "v0.1: writer added composite",
     "v0.2: existential form",
@@ -76,12 +81,24 @@ def gap_K_codingTheorem : GapEntry := {
     "v0.5: hedged after hostile Phase-0",
     "v0.6 (2026-05-12): F3 fix — added Vitányi 2013 supplementary citation; " ++
       "conditional version (Thm 4.3.4) was non-standard in literature prior " ++
-      "to Vitányi 2013, which establishes the conditional convention used here"
+      "to Vitányi 2013, which establishes the conditional convention used here",
+    "v0.6.1 (2026-05-12): Phase-4 re-audit patches.  H3 (HEDGE) fix — " ++
+      "committed K_codingTheorem and μAssignsAtLeast docstrings to Vitányi " ++
+      "Definition 1 convention (lower-semicomputable conditional " ++
+      "semi-measure with Σ_x m(x|y) ≤ 1, lower-semicomputable, " ++
+      "multiplicatively universal).  Vitányi 2013 Theorem 2 shows the " ++
+      "classical quotient m(x,y)/Σ_z m(z,y) convention FAILS the conditional " ++
+      "coding theorem; under that convention this axiom would be unsound"
   ]
   scope :=
-    "Universal additive constant c for the upper bound K(x|y) ≤ k + c " ++
-    "when μ(x|y) ≥ 2^(-k); upper bound only, no matching lower bound; " ++
-    "treats μ as encoded via opaque `μDesc` parameter"
+    "Universal additive constant c for the upper bound K(x|μDesc) ≤ k + c " ++
+    "when μDesc encodes a Vitányi-Definition-1 conditional lower-" ++
+    "semicomputable semi-measure (Σ_x m(x|y) ≤ 1, lower-semicomputable, " ++
+    "multiplicatively universal) and m(x|y) ≥ 2^(-k); upper bound only, " ++
+    "no matching lower bound; treats μ as encoded via opaque `μDesc` " ++
+    "parameter; NOT the classical quotient m(x,y)/Σ_z m(z,y) (Vitányi " ++
+    "2013 Theorem 2 shows that convention FAILS the conditional coding " ++
+    "theorem)"
 }
 
 /-- `K_chainRule_pair` — symmetric-information chain rule, pair-LHS form. -/
@@ -199,13 +216,25 @@ def gap_Bridge_Q_DefExt_TextbookFacts : GapEntry := {
   name := "Bridge_Q_DefExt_TextbookFacts"
   status := GapStatus.gapOpen
   paperSource :=
-    "Σ⁰₁-completeness of Q: Hájek-Pudlák, *Metamathematics of First-Order " ++
-    "Arithmetic*, Springer 1998, Chapter I (PRIMARY, numbered theorem); " ++
-    "Smith, *An Introduction to Gödel's Theorems*, 2nd ed., Cambridge UP " ++
-    "2013, Ch 11 'What Q can prove' (SECONDARY).  " ++
+    "Σ⁰₁-completeness of Q: Smith, *An Introduction to Gödel's Theorems*, " ++
+    "2nd ed., Cambridge UP 2013, Ch 11 'What Q can prove', §'Q is " ++
+    "Σ₁-complete' (PRIMARY; chapter title and section locator verified by " ++
+    "direct CUP frontmatter match — in-chapter theorem number unverified, " ++
+    "so cited at section level only); Hájek-Pudlák, *Metamathematics of " ++
+    "First-Order Arithmetic*, Springer 1998, Preliminaries §(c) 'Beginning " ++
+    "Arithmetization of Metamathematics', pp. 20-26 (SECONDARY, where Q is " ++
+    "introduced and Σ⁰₁-completeness is stated as a foundational " ++
+    "preliminaries-level fact, NOT as a numbered theorem; HP uses " ++
+    "two-level Chapter.Section numbering with letter-labelled subsections " ++
+    "— there is no §1.4; the relativized Σ_n/Π_n hierarchy lives at " ++
+    "Ch I §2(d) p. 81, a DIFFERENT location).  " ++
     "Σ⁰₁-soundness of Q (via N ⊨ Q): Tarski-Mostowski-Robinson, " ++
-    "*Undecidable Theories*, North-Holland, 1953 (one-line corollary " ++
-    "combined with Σ⁰₁-completeness).  " ++
+    "*Undecidable Theories*, North-Holland, 1953, Ch II (Q's axiomatization; " ++
+    "N ⊨ Q is immediate-by-construction from the syntactic axioms but NOT " ++
+    "stated as a numbered theorem) + Smith 2013 §10.1-10.2 (axiom-by-axiom " ++
+    "verification that ℕ satisfies each of Q's seven axioms).  " ++
+    "Σ⁰₁-soundness then follows as one-line corollary combined with " ++
+    "Σ⁰₁-completeness.  " ++
     "Conservativity outside `S*`: Shoenfield, *Mathematical Logic*, " ++
     "Addison-Wesley 1967, §4.6 'Extensions by definitions' (p. 57f) " ++
     "PRIMARY; Hodges, *A Shorter Model Theory*, Cambridge UP 1997, §2.6 " ++
@@ -229,7 +258,31 @@ def gap_Bridge_Q_DefExt_TextbookFacts : GapEntry := {
       "soundness of Q is folklore (one-line corollary of N ⊨ Q + " ++
       "Σ⁰₁-completeness), not in Rogers as a numbered theorem.  Operative " ++
       "source moved to Tarski-Mostowski-Robinson 1953 for N ⊨ Q + " ++
-      "Hájek-Pudlák for Σ⁰₁-completeness."
+      "Hájek-Pudlák for Σ⁰₁-completeness.",
+    "v0.6.1 (2026-05-12): Phase-4 hostile re-audit patches.  H1 (FATAL) — " ++
+      "v0.6's 'Hájek-Pudlák Ch I §1.4' was MISCITED: HP uses two-level " ++
+      "Chapter.Section numbering with letter-labelled subsections, NOT " ++
+      "three-level §1.4; HP Ch I §4 is 'Elements of Logic in Fragments' " ++
+      "(pp. 98-109, provability in fragments — NOT Σ⁰₁-completeness of Q); " ++
+      "the operative Σ⁰₁-completeness of Q lives in HP Preliminaries §(c) " ++
+      "'Beginning Arithmetization of Metamathematics' (pp. 20-26) as " ++
+      "FOLKLORE preliminaries, NOT as a numbered theorem; the relativized " ++
+      "Σ_n/Π_n hierarchy is Ch I §2(d) p. 81, a separate location.  " ++
+      "FIX: PRIMARY/SECONDARY roles reversed — Smith 2013 Ch 11 §'Q is " ++
+      "Σ₁-complete' is now PRIMARY (chapter title and section locator " ++
+      "verified by direct CUP frontmatter match; in-chapter theorem number " ++
+      "unverified so cited at section level only); HP 1998 Preliminaries " ++
+      "§(c) pp. 20-26 is SECONDARY with explicit 'foundational fact, " ++
+      "preliminaries-level folklore, NOT numbered theorem' framing.  " ++
+      "H2 (HEDGE) — TMR 1953 does not contain a numbered 'N ⊨ Q' theorem; " ++
+      "Q is introduced syntactically in TMR Ch II for the undecidability " ++
+      "program and N ⊨ Q is immediate-by-construction (each axiom is a " ++
+      "standard arithmetic fact) but NOT stated as a numbered theorem.  " ++
+      "FIX: added Smith 2013 §10.1-10.2 as supplementary citation for the " ++
+      "axiom-by-axiom verification that ℕ satisfies each of Q's seven " ++
+      "axioms.  H5 (LOW) — no docstring asserted 'Smith Thm 11.X' with a " ++
+      "specific number, so no downgrade needed; we keep Smith Ch 11 cited " ++
+      "at section level ('§Q is Σ₁-complete') throughout"
   ]
   scope :=
     "Universal claim over any 4-tuple (Sstar, qHe, T0_enc, Tstar_enc) " ++
@@ -388,7 +441,11 @@ def gap_thm_emission_CLOSED : GapEntry := {
     "v0.1: theorem stated + axioms added",
     "v0.4: explicit chain-rule constants",
     "v0.5: bundled chain rule split into pair-LHS axiom + " ++
-      "pairNonDecrease axiom + derived single-LHS lemma"
+      "pairNonDecrease axiom + derived single-LHS lemma",
+    "v0.6.1 (2026-05-12): Phase-4 re-audit — K_codingTheorem and " ++
+      "μAssignsAtLeast docstrings now explicitly commit to Vitányi " ++
+      "Definition 1 convention (no semantic change to the chain since " ++
+      "Definition 1 was already the implicit operative convention)"
   ]
   scope :=
     "K(T*|D_t) ≤ k + |M| + |p| + slack constants, where k = -log Pr[M(p)=T*]; " ++
@@ -439,7 +496,12 @@ def gap_thm_undecidable_sigma01_hard_CLOSED : GapEntry := {
     "v0.2: `HaltDistBundle` packed all four conjuncts (mixed-category)",
     "v0.4: split into PURE Category-1 (Bridge_Q_DefExt_TextbookFacts) + " ++
       "PURE Category-3 (Bridge_Tstar_e_Encoding) axioms; theorem proved " ++
-      "from the two bridges via Bridge_Halt_Iff_Dist"
+      "from the two bridges via Bridge_Halt_Iff_Dist",
+    "v0.6.1 (2026-05-12): Phase-4 re-audit patches (citation provenance " ++
+      "only; no proof change) — Bridge_Q_DefExt_TextbookFacts now cites " ++
+      "Smith 2013 Ch 11 primary + HP 1998 Preliminaries §(c) secondary for " ++
+      "Σ⁰₁-completeness, and TMR 1953 Ch II + Smith 2013 §10.1-10.2 for " ++
+      "N ⊨ Q yielding Σ⁰₁-soundness"
   ]
   scope :=
     "Existence of a computable encoding e ↦ (T*_e, T_0) under which " ++
@@ -670,6 +732,43 @@ def gapCounts : Nat × Nat × Nat × Nat × Nat × Nat :=
     F5 (MINOR): K_pairNonDecrease dropped any "Thm 2.2.1" reference,
                 cite by §3.1 only.
     F6 (MINOR): K_descLength self-delimiting hypothesis made explicit.
+
+  Phase-4 hostile re-audit defects fixed (v0.6.1, 2026-05-12):
+    H1 (FATAL): "Hájek-Pudlák Ch I §1.4" miscited — HP uses two-level
+                Chapter.Section numbering with letter-labelled
+                subsections, NOT three-level §1.4; HP Ch I §4
+                "Elements of Logic in Fragments" (pp. 98-109) is
+                about provability in fragments, NOT Σ⁰₁-completeness
+                of Q.  Operative Σ⁰₁-completeness of Q lives in HP
+                Preliminaries §(c) "Beginning Arithmetization of
+                Metamathematics" (pp. 20-26) as FOLKLORE
+                preliminaries, NOT a numbered theorem.
+                FIX: PRIMARY/SECONDARY reversed — Smith 2013 Ch 11
+                §"Q is Σ₁-complete" is now PRIMARY (verified by
+                direct CUP frontmatter match); HP 1998 Preliminaries
+                §(c) is SECONDARY.
+    H2 (HEDGE): TMR 1953 does not contain a numbered "N ⊨ Q"
+                theorem.  Q is introduced syntactically in TMR Ch II
+                for the undecidability program; N ⊨ Q is
+                immediate-by-construction (each axiom is a standard
+                arithmetic fact) but NOT stated as a numbered
+                theorem.  FIX: added Smith 2013 §10.1-10.2 as
+                supplementary citation for axiom-by-axiom
+                verification.
+    H3 (HEDGE): K_codingTheorem and μAssignsAtLeast docstrings now
+                explicitly commit to Vitányi Definition 1 convention
+                (lower-semicomputable conditional semi-measure with
+                Σ_x m(x|y) ≤ 1, lower-semicomputable, multiplicatively
+                universal).  The classical quotient
+                m(x,y)/Σ_z m(z,y) FAILS the conditional coding
+                theorem (Vitányi 2013 Theorem 2).
+    H4 (DEFECT): AxiomAudit.lean stale narrative (BBJ + Rogers /
+                Hodges) updated to match v0.6-patched citation table
+                (Smith + HP + TMR + Smith / Shoenfield primary +
+                Hodges secondary).
+    H5 (LOW): No docstring asserted "Smith Thm 11.X" with a specific
+              number; Smith Ch 11 is cited at section level
+              ("§Q is Σ₁-complete") throughout.  No downgrade needed.
 -/
 
 end EinsteinTest.Ledger
