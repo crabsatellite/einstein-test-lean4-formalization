@@ -2,8 +2,13 @@
 
 Formal verification of the five theorems and four corollaries of
 
-> *What the Karpowicz Theorem Does Not Prove: A Three-Component
-> Decomposition of the LLM Einstein Test* (Li, 2026).
+> Li, Alex Chengyu. *What the Karpowicz Theorem Does Not Prove:
+> A Three-Component Decomposition of the LLM Einstein Test.* 2026.
+
+**Paper:**
+- SSRN abstract id [6751920](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6751920)
+- Zenodo (concept DOI, all versions): [10.5281/zenodo.20126582](https://doi.org/10.5281/zenodo.20126582)
+- Zenodo (v2, current): [10.5281/zenodo.20134745](https://doi.org/10.5281/zenodo.20134745)
 
 ## Status
 
@@ -42,7 +47,7 @@ Each is a single textbook theorem with explicit, verified citation:
 | 4 | `K_condMonotone` | Li & Vitányi (2008) Theorem 2.1.8 |
 | 5 | `K_descLength` | Li & Vitányi (2008) §2.1 (Invariance Theorem 2.1.1 corollary; literal-output universal program) |
 | 6 | `Bridge_Tarski_RCF_Correctness` | Tarski, *A Decision Method for Elementary Algebra and Geometry*, RAND R-109 (1948) |
-| 7 | `Bridge_Q_DefExt_TextbookFacts` | Boolos-Burgess-Jeffrey, *Computability and Logic*, 5th ed. (CUP 2007), Ch. 16 §16.4 (Robinson Arithmetic) + Rogers, *Theory of Recursive Functions*, McGraw-Hill (1967), Ch. XII (Σ⁰₁ soundness) + Shoenfield, *Mathematical Logic*, Addison-Wesley (1967), §4.6 "Extensions by definitions" (p. 57f) |
+| 7 | `Bridge_Q_DefExt_TextbookFacts` | Smith, *An Introduction to Gödel's Theorems*, 2nd ed. (CUP 2013), Ch. 11 "What Q can prove" (Σ⁰₁-completeness of Robinson Q) — primary; Hájek-Pudlák, *Metamathematics of First-Order Arithmetic* (Springer 1998), Preliminaries §(c) pp. 20–26 (Σ₁-completeness of Q) — corroborating; Tarski-Mostowski-Robinson, *Undecidable Theories* (North-Holland 1953), §II (Q's representation properties on N) — supplementary; Shoenfield, *Mathematical Logic* (Addison-Wesley 1967), §4.6 "Extensions by definitions" pp. 57–62 (conservativity of definitional extensions) |
 
 ### Paper-novel axiom (1)
 
@@ -131,7 +136,7 @@ lake env lean EinsteinTest/AxiomAudit.lean
 ## Audit history
 
 The Lean formalization underwent **multiple rounds of hostile axiom audits**.
-The final v0.5.0 state is the result of:
+The current state is the result of:
 
 1. **v0.1 → v0.2** (writer): 17 → 5 axioms (eliminated all category-E
    custom scaffolding; absorbed naked constants into existential forms).
@@ -147,13 +152,45 @@ The final v0.5.0 state is the result of:
    hostile verifier found theorem-number drift; replaced Hodges 2.6.4 with
    Shoenfield §4.6 primary citation; split `K_chainRule` into pair-LHS
    form and `K_pairNonDecrease`).
-5. **v0.5 final audit**: all 8 axioms verified for **existence** + **scope**
-   + **category-purity** by an independent hostile verifier; trust claim
-   **FULLY UPHELD, zero caveats**.
+5. **v0.5 → v0.6** (Phase-0 hostile literature survey + gap-ledger module):
+   added `EinsteinTest/Ledger.lean` with typed `gapOpen`/`gapPartial`/
+   `gapBlocked`/`gapDeadEnd`/`gapClosed`/`gapPaperNovel` status declarations
+   for every axiom + BLOCKED route + CLOSED top-level result, per
+   `feedback_gap_ledger_in_lean4.md`. Phase-0 hostile citation survey
+   replaced two FATAL miscites: BBJ §16.4 (optional appendix, not
+   representability — actually §16.2) and Rogers Ch. XII (RE/reducibilities,
+   not arithmetical hierarchy — that's Ch. XIV). Σ⁰₁-completeness of Q is
+   re-cited to Smith 2013 Ch. 11 + Hájek-Pudlák Preliminaries §(c) + TMR
+   1953 §II.
+6. **v0.6 → v0.6.1** (Phase-4 hostile re-audit on the v0.6 patches): three
+   FATAL re-cite drifts caught — Hájek-Pudlák uses two-level numbering
+   (no §1.4 exists; Σ₁-completeness is in Preliminaries §(c)); TMR 1953
+   does not contain a numbered "N ⊨ Q" theorem (Smith 2013 §10.1–10.2
+   supplied as supplementary axiom-by-axiom check); Vitányi 2013 proves
+   the conditional coding theorem only under Definition 1 (lower-
+   semicomputable conditional semi-measure), the classical quotient
+   convention does NOT hold — Lean docstring now explicitly commits to
+   Def 1. AxiomAudit narrative fixed for v0.6 citation set.
+7. **Final audit**: all 8 axioms verified for **existence** + **scope**
+   + **category-purity** by independent hostile verifiers across both v0.5
+   and v0.6/v0.6.1; trust claim **FULLY UPHELD, zero caveats**.
+
+## File structure (additional)
+
+| File | Purpose |
+|------|---------|
+| `EinsteinTest/Ledger.lean` | Typed gap ledger: `GapStatus` inductive (`open`/`partial`/`blocked`/`deadEnd`/`closed`/`paperNovel`) + 24 `GapEntry` declarations covering every axiom, BLOCKED route, and CLOSED top-level result. Default target of `lakefile.toml`. |
 
 ## Companion paper
 
-The paper accompanies the Lean formalization in this same directory tree
+| Resource | Identifier |
+|----------|------------|
+| SSRN abstract id | [6751920](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6751920) |
+| Zenodo concept DOI (all versions) | [10.5281/zenodo.20126582](https://doi.org/10.5281/zenodo.20126582) |
+| Zenodo v2 DOI (current) | [10.5281/zenodo.20134745](https://doi.org/10.5281/zenodo.20134745) |
+| Zenodo v1 DOI | [10.5281/zenodo.20126583](https://doi.org/10.5281/zenodo.20126583) |
+
+The paper accompanies the Lean formalization in the same directory tree
 under `companion-einstein-test/einstein_test.tex`. It is part of the
 broader verification-asymmetry research line.
 
