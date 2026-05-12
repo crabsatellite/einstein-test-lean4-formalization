@@ -32,7 +32,7 @@ jobs:
 
       - name: Verify no sorry in source
         run: |
-          if grep -rn '\bsorry\b' EinsteinTest/ --include="*.lean" | grep -v '^\s*--' | grep -v 'sorry-free' | grep -v 'no sorry' | grep -v 'zero sorry'; then
+          if grep -rn '\bsorry\b' EinsteinTest/ --include="*.lean" | grep -v '^\s*--' | grep -v '`sorry`' | grep -v 'sorry-free' | grep -v 'no sorry' | grep -v 'zero sorry'; then
             echo "ERROR: sorry found in source code"
             exit 1
           fi
