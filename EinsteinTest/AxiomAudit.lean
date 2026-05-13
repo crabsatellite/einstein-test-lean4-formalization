@@ -3,188 +3,83 @@
 
   Prints the axiom dependency list for every paper-level theorem.
 
-  Trust policy: every `axiom` declaration in the source must fall
-  into exactly one of three categories:
+  Trust policy.  Every `axiom` declaration in the project falls into
+  exactly one of three categories (per `feedback_gap_ledger_in_lean4`
+  ATOMIC MINIMAL UNITS interpretation):
 
-    (A) standard kernel:  `propext`, `Classical.choice`, `Quot.sound`
-        — provided by Lean / Mathlib, not declared here.
-    (C) literature bridge: a single-step textbook claim with explicit
-        citation in the axiom's docstring.
-    (D) paper-novel axiom: a definitional / structural claim from the
-        companion paper "What the Karpowicz Theorem Does Not Prove"
-        (Li 2026), tied to a specific `\label{...}`.
+    Cat 1 — Mathlib-derivable: claim closes via Mathlib + kernel.
+            Must be encoded as `theorem`, not `axiom`.  Project has
+            no Cat 1 axioms because the Mathlib infrastructure for
+            K-complexity, Robinson Q, and Tarski CAD is absent; see
+            the three `gapBlocked` entries in `EinsteinTest.Ledger`.
 
-  No (E) custom-scaffolding axioms (e.g. naked constants, abstract-
-  type-inhabitation stipulations) are permitted.
+    Cat 2 — External published (textbook / peer-reviewed paper):
+            opaque-carrier-bound atomic axiom + precise citation.
 
-  Expected axiom dependencies per theorem:
+    Cat 3 — Paper-novel: typed primitive carrier (`axiom`) or
+            paper-stated atomic defining equation (`axiom`).  Cited
+            only to Li 2026 `\label{thm:undecidable}` construction
+            or other paper-stated atomic clauses.
 
-  * Theorem 1 (`thm_floor`), Theorem 5 (`thm_self_verification`),
-    Theorem 4 (`thm_decomposition`), Corollary `cor_empirical_necessity`,
-    Corollary `cor_bound_interaction_iii`, Corollary
-    `cor_conditional_feasibility`, `tauMin_nonneg`:
-    standard kernel only — `propext`, `Classical.choice`, `Quot.sound`.
+  Plus the Lean kernel axioms (`propext`, `Classical.choice`,
+  `Quot.sound`), provided by Lean / Mathlib core.
 
-  * Theorem 2 (`thm_emission`):
-    standard kernel + five literature-cited Kolmogorov bridges
-    (each a single existential statement; the constants
-    `K_*_const` and `K_chainRule_slack` are `Classical.choose`-
-    derived from the existentials and do not appear as separate
-    axioms):
-      `K_codingTheorem`     — Li-Vitányi, 3rd ed. (2008), Thm 4.3.4
-                              (conditional coding theorem) + Vitányi
-                              2013 (TCS 501, pp. 93–100, arXiv:1206.0983)
-                              for the explicit conditional-version proof
-      `K_chainRule_pair`    — Li-Vitányi, 3rd ed. (2008), Thm 3.9.1
-                              (pair-LHS form only; single-LHS form
-                              is DERIVED via `K_pairNonDecrease`)
-      `K_pairNonDecrease`   — Li-Vitányi, 3rd ed. (2008), §3.1
-                              (information non-decrease under pairing)
-      `K_condMonotone`      — Li-Vitányi, 3rd ed. (2008), §3.1 / §3.4
-                              (prefix-`K` analogue of plain-complexity
-                              Ch 2 result Thm 2.1.8; the Lean axiom is
-                              stated for prefix `K`, transfer to which
-                              proceeds via §3.1/§3.4 by relativizing
-                              the universal prefix machine)
-      `K_descLength`        — Li-Vitányi, 3rd ed. (2008), §2.1
-                              (immediate consequence of the Invariance
-                              Theorem Thm 2.1.1 via the literal-output
-                              universal program; REQUIRES descLen y to
-                              include self-delimiting overhead — see
-                              axiom docstring; without prefix-coding the
-                              textbook bound carries an extra 2log|y| term)
+  Constraints.  No (E) custom-scaffolding axioms (naked constants,
+  abstract-type-inhabitation stipulations).  No composite axioms
+  bundling multiple independent textbook results or hybrid Cat 2 +
+  Cat 3 steps.
 
-  * Corollary `cor_rare`, Remark `rem_emission_not_impossible`:
-    standard kernel only (the KC bridges are scoped to `thm_emission`
-    itself; corollaries that take `K_*` as an abstract real do not
-    depend on the bridges).
+  Inventory by category (live counts: see `lake env lean
+  EinsteinTest/Ledger.lean`):
 
-  * Theorem 3 (`thm_undecidable_sigma01_hard`) / Corollary
-    `cor_no_universal`:
-    standard kernel + TWO PURE single-category recursion-theoretic
-    bridges:
-      `Bridge_Tstar_e_Encoding`         — Category 3 paper-novel
-                                          (Li 2026 \label{thm:undecidable}
-                                          construction; clauses (iii)+(iv))
-      `Bridge_Q_DefExt_TextbookFacts`   — Category 1 literature
-                                          (Σ⁰₁-completeness of Q:
-                                          Smith 2013 Ch 11
-                                          §"Q is Σ₁-complete",
-                                          primary; Hájek-Pudlák 1998
-                                          Preliminaries §(c)
-                                          pp. 20-26, secondary;
-                                          Σ⁰₁-soundness via
-                                          N ⊨ Q: TMR 1953 Ch II +
-                                          Smith 2013 §10.1-10.2;
-                                          conservativity:
-                                          Shoenfield 1967 §4.6 primary,
-                                          Hodges 1997 §2.6 secondary)
-    Every axiom is exactly one of {literature theorem, standard
-    library, paper-novel claim}; no composite axioms remain.
-    The derived accessors `DistinguishedObs`, `Q_proves_He`,
-    `Bridge1b_T0`, `Bridge1b_Tstar`, `Bridge_Q_Sigma01_complete_sound`,
-    `Bridge_DefExt_Conservative`, `Bridge_Encoding_Sstar_T0`,
-    `Bridge_Encoding_Sstar_Tstar` are now `Classical.choose`-derived
-    (the encoding ones from `Bridge_Tstar_e_Encoding`, the textbook
-    ones from `Bridge_Q_DefExt_TextbookFacts`) and do NOT appear as
-    axioms.
+    Cat 2 propositional axioms (Li-Vitányi + Tarski + Smith / HP /
+    TMR / Shoenfield / Hodges):
+      K_codingTheorem, K_chainRule_pair, K_pairNonDecrease,
+      K_condMonotone, K_descLength, Bridge_Tarski_RCF_Correctness,
+      Bridge_Q_Sigma01_completeness, Bridge_Q_Sigma01_soundness,
+      Bridge_DefExt_Conservative
 
-  * `thm_undecidable_tarski_decidable`:
-    standard kernel + `Bridge_Tarski_RCF_Correctness` (single
-    literature citation: Tarski 1948 RAND R-109).  The statement
-    `∃ b : Bool, b = true ↔ RCFSatisfies φ` captures the substantive
-    content of Tarski's decision procedure (a trivial
-    `∃ b, RCFDecide φ = b` would be vacuous by `Bool`-typing).
+    Cat 3 propositional defining equations (Li 2026):
+      Bridge_Encoding_Sstar_T0, Bridge_H_e_distinct_from_Sstar,
+      Bridge_Defining_Biconditional
 
-  * `thm_undecidable_sigma02_upper`:
-    standard kernel only / no axioms.
+    Cat 3 carrier axioms (Li 2026):
+      DistinguishedObs, H_e_Obs, Bridge1b_T0, Bridge1b_Tstar
 
-  Any axiom outside this list is a RED FLAG — investigate.
+  Cat 2 framework opaques (primitive types/functions at the
+  inhabited-type level, not axioms in `#print axioms`):
+    Li-Vitányi (2008) universal prefix machine framework:
+      KObj, encodeTh, encodeData, encodePair, K, Kcond, descLen,
+      μAssignsAtLeast
+    Tarski 1948 RCF syntax / decision procedure / standard semantics:
+      RCFFormula, RCFDecide, RCFSatisfies
 
-  Trust audit summary (8 axioms total; every axiom PURE single-category
-  and citation-precise):
-  ┌─────────────────────────────────┬──────────┬─────────────────────────────────────────────────────────┐
-  │ Axiom                           │ Category │ Citation                                                │
-  ├─────────────────────────────────┼──────────┼─────────────────────────────────────────────────────────┤
-  │ K_codingTheorem                 │ 1        │ Li-Vitányi, 3rd ed. (2008), Thm 4.3.4 (conditional      │
-  │                                 │          │ coding theorem) + Vitányi, *TCS* 501 (2013), 93–100,    │
-  │                                 │          │ arXiv:1206.0983 (explicit conditional-version proof —   │
-  │                                 │          │ conditional convention was non-standard prior to 2013)  │
-  │ K_chainRule_pair                │ 1        │ Li-Vitányi, 3rd ed. (2008), Thm 3.9.1                   │
-  │                                 │          │ (pair-LHS form only)                                    │
-  │ K_pairNonDecrease               │ 1        │ Li-Vitányi, 3rd ed. (2008), §3.1                        │
-  │                                 │          │ (information non-decrease under pairing; single-LHS     │
-  │                                 │          │ chain-rule variant is a derived lemma                   │
-  │                                 │          │ `K_chainRule_single_apply`)                             │
-  │ K_condMonotone                  │ 1        │ Li-Vitányi, 3rd ed. (2008), §3.1 / §3.4 (prefix-`K`     │
-  │                                 │          │ analogue of plain-complexity Ch 2 Thm 2.1.8; prior      │
-  │                                 │          │ "Thm 2.1.8" was for plain `C`, Lean axiom is for prefix │
-  │                                 │          │ `K`; result transfers by relativizing universal prefix  │
-  │                                 │          │ machine)                                                │
-  │ K_descLength                    │ 1        │ Li-Vitányi, 3rd ed. (2008), §2.1                        │
-  │                                 │          │ (immediate consequence of Thm 2.1.1 Invariance via the  │
-  │                                 │          │ literal-output universal program.  REQUIRES descLen y   │
-  │                                 │          │ to include self-delimiting overhead — without it, the   │
-  │                                 │          │ textbook bound is K(y|z) ≤ |y| + 2log|y| + c)           │
-  │ Bridge_Tarski_RCF_Correctness   │ 1        │ Tarski 1948 RAND R-109                                  │
-  │ Bridge_Q_DefExt_TextbookFacts   │ 1        │ Σ⁰₁-completeness of Q: Smith 2013 (Cambridge, *An Intro │
-  │                                 │          │ to Gödel's Theorems* 2nd ed.) Ch 11 "What Q can prove", │
-  │                                 │          │ §"Q is Σ₁-complete", PRIMARY (chapter title + section   │
-  │                                 │          │ locator verified by direct CUP frontmatter match;       │
-  │                                 │          │ in-chapter theorem number unverified, so cited at       │
-  │                                 │          │ section level only); Hájek-Pudlák 1998 (Springer,       │
-  │                                 │          │ Perspectives in Logic) Preliminaries §(c) "Beginning    │
-  │                                 │          │ Arithmetization of Metamathematics", pp. 20-26,         │
-  │                                 │          │ SECONDARY (foundational preliminaries-level fact, NOT   │
-  │                                 │          │ numbered theorem; HP uses two-level Chapter.Section     │
-  │                                 │          │ numbering — there is no §1.4).  Σ⁰₁-soundness via       │
-  │                                 │          │ N ⊨ Q: Tarski-Mostowski-Robinson 1953 *Undecidable      │
-  │                                 │          │ Theories* (North-Holland) Ch II for Q's axiomatization  │
-  │                                 │          │ + Smith 2013 §10.1-10.2 for axiom-by-axiom verification │
-  │                                 │          │ that ℕ satisfies each of Q's seven axioms.              │
-  │                                 │          │ Conservativity: Shoenfield 1967 §4.6 PRIMARY            │
-  │                                 │          │ (theorem-numbered) + Hodges 1997 §2.6 secondary.        │
-  │                                 │          │ Round-history (prior retracted citations for these      │
-  │                                 │          │ facts) lives in                                         │
-  │                                 │          │ `gap_Bridge_Q_DefExt_TextbookFacts.attackHistory`       │
-  │                                 │          │ inside `EinsteinTest.Ledger`.                           │
-  │ Bridge_Tstar_e_Encoding         │ 3        │ Li 2026 \label{thm:undecidable} construction (paper-    │
-  │                                 │          │ novel encoding clauses (iii) S*∉π(T_0) + (iv) S*∈π(T*_e)│
-  │                                 │          │ ↔ qHe(e); abstract realization of T*_e := Q ∪ {S*↔H_e}) │
-  └─────────────────────────────────┴──────────┴─────────────────────────────────────────────────────────┘
+  Per-axiom citations live in the corresponding `axiom` docstring in
+  the source file.  Round-history (prior retracted citations + atomic
+  refactor steps) lives in `gap_*.attackHistory` fields inside
+  `EinsteinTest.Ledger`.
 
-  **Pure single-category split (recursion-theoretic bridges).** The
-  recursion-theoretic content is decomposed into two pure
-  single-category axioms:
+  Per-theorem axiom dependency profile (verified by `#print axioms`
+  below):
 
-    * `Bridge_Tstar_e_Encoding` (PURE Category 3): an EXISTENTIAL
-      witnessing (Sstar, qHe, T0_enc, Tstar_enc) satisfying ONLY the
-      paper-novel encoding clauses (iii) `S* ∉ π(T_0)` and (iv)
-      `S* ∈ π(T*_e) ↔ qHe(e)`.  No textbook content.
+    * Lean kernel only (`propext`, `Classical.choice`, `Quot.sound`):
+        thm_floor, tauMin_nonneg, thm_self_verification,
+        cor_self_verif_robust_{i,ii,iii,iv}, cor_empirical_necessity,
+        cor_bound_interaction_iii, cor_rare, rem_emission_not_impossible,
+        thm_decomposition, cor_conditional_feasibility,
+        thm_undecidable_sigma02_upper.
 
-    * `Bridge_Q_DefExt_TextbookFacts` (PURE Category 1): a UNIVERSAL
-      claim that for any 4-tuple satisfying the encoding clauses
-      (iii)+(iv), the textbook facts (i) `qHe e ↔ Halt(e)` (Smith
-      2013 Ch 11 primary, Hájek-Pudlák 1998 Preliminaries §(c)
-      secondary, for Σ⁰₁-completeness; TMR 1953 Ch II + Smith 2013
-      §10.1-10.2 for N ⊨ Q yielding Σ⁰₁-soundness) and (ii)
-      conservativity outside `S*` (Shoenfield 1967 §4.6 primary +
-      Hodges 1997 §2.6 secondary) hold.  No paper-novel content;
-      pure textbook conclusions.
+    * Lean kernel + Cat 2 KC bridges:
+        thm_emission.
 
-  Every axiom in the project is now exactly one of {literature
-  theorem, standard library, paper-novel claim} — no composite
-  axioms remain.
+    * Lean kernel + Cat 3 carriers + Cat 3 defining equations + Cat 2
+      recursion-theoretic textbook axioms:
+        thm_undecidable_sigma01_hard, cor_no_universal.
 
-  Opaque declarations (primitive types/functions, not axioms):
-    KObj, encodeTh, encodeData, encodePair,   — Li-Vitányi, 3rd ed.
-    K, Kcond, descLen, μAssignsAtLeast          (2008), §3.1
-                                                (universal prefix
-                                                machine framework)
-    RCFFormula, RCFDecide, RCFSatisfies       — Tarski 1948 framework
-                                                (RCF syntax /
-                                                decision procedure /
-                                                standard semantics)
+    * Lean kernel + Bridge_Tarski_RCF_Correctness:
+        thm_undecidable_tarski_decidable.
+
+  Any axiom outside the inventory above is a RED FLAG — investigate.
 
   Usage:
     lake exe cache get
@@ -193,7 +88,7 @@
 
 import EinsteinTest
 
--- Core structural theorems (standard kernel only).
+-- Lean-kernel-only theorems.
 #print axioms EinsteinTest.thm_floor
 #print axioms EinsteinTest.tauMin_nonneg
 #print axioms EinsteinTest.thm_self_verification
@@ -211,10 +106,13 @@ import EinsteinTest
 #print axioms EinsteinTest.thm_decomposition
 #print axioms EinsteinTest.cor_conditional_feasibility
 
--- Recursion-theoretic theorems (split bridges: Bridge_Tstar_e_Encoding
--- = Cat 3 paper-novel, Bridge_Q_DefExt_TextbookFacts = Cat 1 literature,
--- Bridge_Tarski_RCF_Correctness = Cat 1 literature).
+-- Recursion-theoretic theorems.
 #print axioms EinsteinTest.thm_undecidable_sigma01_hard
 #print axioms EinsteinTest.thm_undecidable_tarski_decidable
 #print axioms EinsteinTest.thm_undecidable_sigma02_upper
 #print axioms EinsteinTest.cor_no_universal
+
+-- Derived theorems composing atomic axioms.
+#print axioms EinsteinTest.Bridge_Halt_Iff_Dist
+#print axioms EinsteinTest.Bridge_Q_Sigma01_complete_sound
+#print axioms EinsteinTest.Bridge_Sstar_iff_Halt

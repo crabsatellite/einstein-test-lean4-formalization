@@ -24,10 +24,14 @@
     `Quot.sound`, plus the explicitly declared `K_*` Kolmogorov bridges.
 
   Gap ledger:
-    EinsteinTest/Ledger.lean — typed record of every axiom + BLOCKED
-    route + CLOSED top-level result, per `feedback_gap_ledger_in_lean4.md`.
-    Status taxonomy: gapOpen / gapPartial / gapBlocked / gapDeadEnd /
-    gapClosed / gapPaperNovel.  Canonical attack-history record.
+    EinsteinTest/Ledger.lean — typed record of every atomic axiom,
+    every Cat 3 carrier, every blocked route, and every closed
+    top-level result.  Two orthogonal classifications per entry:
+      * 5-tier status: gapOpen / gapPartial / gapBlocked / gapDeadEnd /
+        gapClosed
+      * 3-input-category: cat1Mathlib / cat2External / cat3PaperNovel /
+        notInput
+    Canonical attack-history record.
 -/
 
 import EinsteinTest.Basic

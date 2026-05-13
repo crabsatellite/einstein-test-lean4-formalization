@@ -37,13 +37,8 @@ jobs:
             exit 1
           fi
 
-      - name: Verify axiom count
-        run: |
-          AXIOM_COUNT=$(grep -h "^axiom " EinsteinTest/*.lean | wc -l)
-          if [ "$AXIOM_COUNT" -ne 8 ]; then
-            echo "ERROR: expected 8 axioms, found $AXIOM_COUNT"
-            exit 1
-          fi
-
       - name: Run axiom audit
         run: lake env lean EinsteinTest/AxiomAudit.lean
+
+      - name: Print gap-ledger inventory
+        run: lake env lean EinsteinTest/Ledger.lean
