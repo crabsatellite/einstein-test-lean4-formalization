@@ -29,8 +29,9 @@
   super-family of Dist-deciders.
 
   Lean atomic axiom surface (per `feedback_gap_ledger_in_lean4`
-  ATOMIC MINIMAL UNITS; full Mathlib FO-encoding deferred to
-  `gap_FOTheory_encoding_BLOCKED` in `EinsteinTest.Ledger`):
+  ATOMIC MINIMAL UNITS; full Mathlib FO-encoding of Robinson Q is
+  deferred — under v6 this is not `gapBlocked`, since the textbook
+  claims are accepted on external authority as Cat 2 axioms below):
 
   * Cat 3 carriers (paper-novel typed primitives):
       `DistinguishedObs`  — fresh `S*` predicate
@@ -99,22 +100,30 @@ def Dist (W : ObservationalWorld) (T1 T2 : W.Th) : Prop :=
 -/
 
 /-- Distinguished observable `S*`: the fresh 0-ary predicate added
-    to `T_0 = Q` in the adversarial construction. -/
+    to `T_0 = Q` in the adversarial construction.
+
+    *Cat 3 sub-type: carrier (primitive type).* -/
 axiom DistinguishedObs (W : ObservationalWorld) [REAxiomatised W] : W.Obs
 
 /-- Paper's halting sentence `H_e := ∃t. T(e, 0, t)` (Kleene's
     T-predicate Σ⁰₁ sentence asserting machine `e` halts on input 0),
     encoded as an L_0-observable indexed by Turing-machine codes.
     This is the L_0-sentence on the right-hand side of the
-    defining biconditional `S* ↔ H_e`. -/
+    defining biconditional `S* ↔ H_e`.
+
+    *Cat 3 sub-type: carrier (primitive type).* -/
 axiom H_e_Obs (W : ObservationalWorld) [REAxiomatised W] :
     Nat.Partrec.Code → W.Obs
 
-/-- Base theory `T_0 = Q`: abstract realisation of Robinson's Q. -/
+/-- Base theory `T_0 = Q`: abstract realisation of Robinson's Q.
+
+    *Cat 3 sub-type: carrier (primitive type).* -/
 axiom Bridge1b_T0 (W : ObservationalWorld) [REAxiomatised W] : W.Th
 
 /-- Extension family `T*_e := Q ∪ {S* ↔ H_e}`: abstract realisation
-    indexed by Turing-machine codes. -/
+    indexed by Turing-machine codes.
+
+    *Cat 3 sub-type: carrier (primitive type).* -/
 axiom Bridge1b_Tstar (W : ObservationalWorld) [REAxiomatised W] :
     Nat.Partrec.Code → W.Th
 
@@ -131,7 +140,9 @@ axiom Bridge1b_Tstar (W : ObservationalWorld) [REAxiomatised W] :
 -/
 
 /-- (iii) `S*` is fresh in `T_0`: since `S*` does not occur in `T_0`'s
-    axioms, `T_0 ⊬ S*`, hence `S* ∉ π(T_0)`. -/
+    axioms, `T_0 ⊬ S*`, hence `S* ∉ π(T_0)`.
+
+    *Cat 3 sub-type: structural defining equation.* -/
 axiom Bridge_Encoding_Sstar_T0 (W : ObservationalWorld) [REAxiomatised W] :
     DistinguishedObs W ∉ W.predict (Bridge1b_T0 W)
 
@@ -139,7 +150,9 @@ axiom Bridge_Encoding_Sstar_T0 (W : ObservationalWorld) [REAxiomatised W] :
     `Obs` is the disjoint atomic union `L_0 ∪ {S*}` with `H_e ∈ L_0`,
     so `H_e ≠ S*`.  This side-condition is needed to instantiate
     `Bridge_DefExt_Conservative` (universally quantified over
-    `S ≠ DistinguishedObs W`) at the specific observable `H_e_Obs e`. -/
+    `S ≠ DistinguishedObs W`) at the specific observable `H_e_Obs e`.
+
+    *Cat 3 sub-type: structural defining equation.* -/
 axiom Bridge_H_e_distinct_from_Sstar
     (W : ObservationalWorld) [REAxiomatised W] :
     ∀ e, H_e_Obs W e ≠ DistinguishedObs W
@@ -154,7 +167,9 @@ axiom Bridge_H_e_distinct_from_Sstar
     `T*_e ⊢ H_e ↔ Q ⊢ H_e` (Step 2) is a separate Cat 2 fact
     derived from `Bridge_DefExt_Conservative` specialised at the
     observable `H_e_Obs e ≠ DistinguishedObs W` (using
-    `Bridge_H_e_distinct_from_Sstar`). -/
+    `Bridge_H_e_distinct_from_Sstar`).
+
+    *Cat 3 sub-type: structural defining equation.* -/
 axiom Bridge_Defining_Biconditional
     (W : ObservationalWorld) [REAxiomatised W] :
     ∀ e, DistinguishedObs W ∈ W.predict (Bridge1b_Tstar W e) ↔
@@ -192,8 +207,8 @@ axiom Bridge_Q_Sigma01_completeness
     preliminaries fact, not a numbered theorem.
 
     A strictly atomic split (`N_models_Q` + `Sigma01_soundness_of_-
-    FO_derivation`) is deferred to a Mathlib FO formalisation; see
-    `gap_FOTheory_encoding_BLOCKED` in `EinsteinTest.Ledger`. -/
+    FO_derivation`) is deferred to a future Mathlib FO formalisation
+    of Robinson Q. -/
 axiom Bridge_Q_Sigma01_soundness
     (W : ObservationalWorld) [REAxiomatised W] :
     ∀ e, H_e_Obs W e ∈ W.predict (Bridge1b_T0 W) →

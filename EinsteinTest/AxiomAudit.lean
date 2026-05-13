@@ -10,8 +10,10 @@
     Cat 1 — Mathlib-derivable: claim closes via Mathlib + kernel.
             Must be encoded as `theorem`, not `axiom`.  Project has
             no Cat 1 axioms because the Mathlib infrastructure for
-            K-complexity, Robinson Q, and Tarski CAD is absent; see
-            the three `gapBlocked` entries in `EinsteinTest.Ledger`.
+            K-complexity, Robinson Q, and Tarski CAD is absent.
+            Per v6, Mathlib infra absence alone is not `gapBlocked`:
+            the underlying claims are accepted on external textbook
+            authority and encoded as Cat 2 axioms.
 
     Cat 2 — External published (textbook / peer-reviewed paper):
             opaque-carrier-bound atomic axiom + precise citation.

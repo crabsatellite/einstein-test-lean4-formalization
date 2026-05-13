@@ -26,9 +26,9 @@ All axioms are atomic minimal units, classified as one of:
 
 The project has **zero Cat 1 axioms** because the Mathlib infrastructure
 needed for Mathlib-derivability (K-complexity, Robinson Q, Tarski CAD)
-is absent; the three corresponding `gapBlocked` entries in
-[`EinsteinTest/Ledger.lean`](EinsteinTest/Ledger.lean) record the
-deferred Mathlib derivations.
+is absent.  Per the v6 ATOMIC MINIMAL UNITS spec, Mathlib infra absence
+alone is not `gapBlocked` — the corresponding claims are accepted on
+external textbook authority and recorded as Cat 2 `gapOpen` axioms.
 
 Every axiom is an atomic minimal unit (no composite bundles).  The
 authoritative current inventory of axiom names, citations, and per-

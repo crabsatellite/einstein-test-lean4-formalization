@@ -1,20 +1,32 @@
 /-
   EinsteinTest/Ledger.lean
 
-  Gap ledger.  Every atomic axiom, every Cat 3 carrier, every blocked
-  route, and every closed top-level result is recorded as a typed
-  `GapEntry` with TWO orthogonal classifications:
+  Gap ledger.  Every atomic axiom and every closed top-level result is
+  recorded as a typed `GapEntry` with three orthogonal classifications:
 
-    * 5-tier status:   gapOpen / gapPartial / gapBlocked / gapDeadEnd / gapClosed
-    * 3-input-category: cat1Mathlib / cat2External / cat3PaperNovel / notInput
+    * 5-tier status:    gapOpen / gapPartial / gapBlocked / gapDeadEnd / gapClosed
+    * 4-input-category: cat1Mathlib / cat2External / cat3PaperNovel / notInput
+    * Cat 3 sub-type:   carrier / hypothesisPredicate / structuralEquation /
+                        workingAssumption / conditionalHypothesis / notCat3
 
   Pre-attack discipline.  Scan this ledger before launching new
   attacks.  Re-attempting a `gapBlocked` or `gapDeadEnd` route is a
   context-drift failure mode.
 
   `attackHistory` is the canonical location for round metadata
-  (citation revisions, atomic refactors, prior retractions); docstrings
-  and scope fields are kept to current-state content only.
+  (citation revisions, atomic refactors, prior retractions, Cat 3
+  reductionism check outcomes); docstrings and scope fields are kept
+  to current-state content only.
+
+  Note on Mathlib gaps.  Per the v6 ATOMIC MINIMAL UNITS spec, "Mathlib
+  infra absence ALONE is NOT BLOCKED" — if a paper's conclusion is
+  published externally, encode as a plain Cat 2 axiom + paper-citation
+  docstring (status `gapOpen`).  The `gapBlocked` tier is reserved for
+  genuine no-acceptance-possible cases (folkloric with no specific
+  paper, externally-conjectured-unproven, or no source at all).  This
+  ledger therefore has zero `gapBlocked` entries: K-complexity,
+  Robinson-Q FO encoding, and Tarski CAD are all covered by external
+  textbook Cat 2 axioms with `gapOpen` status.
 -/
 
 import EinsteinTest
@@ -30,30 +42,66 @@ inductive GapStatus
   | gapClosed
   deriving DecidableEq, Repr
 
-/-- 3-input-category tag attached to each gap.  Orthogonal to status. -/
+/-- 4-input-category tag attached to each gap.  Orthogonal to status.
+    (Cat 0 = Lean kernel axioms — `propext` / `Classical.choice` /
+    `Quot.sound` — is the always-present system layer and is not
+    tracked here per v6 §3.1.) -/
 inductive InputCategory
   /-- Mathlib-derivable theorem (no axiom).  Project has zero such. -/
   | cat1Mathlib
   /-- External published; opaque-carrier-bound axiom + citation. -/
   | cat2External
-  /-- Paper-novel: carrier or paper-stated atomic defining equation. -/
+  /-- Paper-novel: carrier, hypothesis predicate, structural defining
+      equation, working assumption, or conditional hypothesis.
+      Refine via the `cat3SubType` field. -/
   | cat3PaperNovel
-  /-- Not an atomic input: derived theorem (gapClosed) or blocked
-      Mathlib-derivation route (gapBlocked). -/
+  /-- Not an atomic input: derived theorem (gapClosed) or genuine
+      no-acceptance-possible route (gapBlocked / gapDeadEnd). -/
   | notInput
+  deriving DecidableEq, Repr
+
+/-- Cat 3 paper-novel sub-types per v6 §3.4.  Orthogonal to status and
+    input-category; only meaningful when `inputCategory = cat3PaperNovel`. -/
+inductive Cat3SubType
+  /-- Paper-introduced primitive type or typed-primitive value
+      (e.g., paper 5-tuple carriers).  Definitional atom; 永不 close. -/
+  | carrier
+  /-- Paper-introduced scope/regime predicate (e.g., `Conditions_C1_C2_C3`,
+      `IsBlackwellOrdered`).  Definitional atom; 永不 close. -/
+  | hypothesisPredicate
+  /-- Paper-stated definitional equation on its primitives (e.g., paper
+      Def 2.6 `V_dyn(v|H,ω) = max{r(w) : w ∈ R(v|H,ω)}`).  Definitional
+      atom; 永不 close — these constitute the paper's commitments to
+      how its primitives behave. -/
+  | structuralEquation
+  /-- Higher-level claim temporarily axiomatized while derivation is
+      developed.  必须 close before paper submission. -/
+  | workingAssumption
+  /-- Paper's conclusion conditional on an external open problem (RH,
+      BSD, Hodge, P≠NP).  永不 close; encoded as theorem-signature
+      antecedent `theorem T (hRH : RiemannHypothesis) : ...`, NOT as
+      an axiom.  Listed here only for completeness; project has none. -/
+  | conditionalHypothesis
+  /-- This entry is not Cat 3 paper-novel. -/
+  | notCat3
   deriving DecidableEq, Repr
 
 /-- Typed record for a single gap. -/
 structure GapEntry where
   /-- Identifier matching the underlying axiom / theorem name. -/
   name : String
-  /-- 5-tier status (orthogonal to inputCategory). -/
+  /-- 5-tier status. -/
   status : GapStatus
   /-- Input category (orthogonal to status). -/
   inputCategory : InputCategory
+  /-- Cat 3 sub-type (orthogonal; `notCat3` unless `inputCategory =
+      cat3PaperNovel`). -/
+  cat3SubType : Cat3SubType
   /-- Operative paper / obstacle citation. -/
   paperSource : String
-  /-- Per-round attack trace (canonical location for round metadata). -/
+  /-- Per-round attack trace (canonical location for round metadata).
+      For Cat 3 entries, MUST include ≥2 reductionism check outcomes
+      (Cat 1? Cat 2?) per v6 §5. -/
   attackHistory : List String
   /-- What content the entry carries; what it does NOT claim. -/
   scope : String
@@ -65,6 +113,7 @@ def gap_K_codingTheorem : GapEntry := {
   name := "K_codingTheorem"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li-Vitányi 3rd ed. (2008) Thm 4.3.4 (conditional coding theorem); " ++
     "Vitányi, *TCS* 501 (2013), 93–100 (arXiv:1206.0983), Theorem 4 " ++
@@ -72,8 +121,8 @@ def gap_K_codingTheorem : GapEntry := {
     "with Σ_x m(x|y) ≤ 1 + multiplicative universality), for the " ++
     "explicit conditional-version proof"
   attackHistory := [
-    "v0.6 (2026-05-12): Vitányi 2013 supplementary citation added; " ++
-      "Thm 4.3.4 conditional version was non-standard prior to 2013",
+    "v0.6: Vitányi 2013 supplementary citation added; Thm 4.3.4 " ++
+      "conditional version was non-standard prior to 2013",
     "v0.6.1: H3 patch — docstring committed to Vitányi Definition 1 " ++
       "convention (classical quotient m(x,y)/Σ_z m(z,y) FAILS the " ++
       "conditional coding theorem, Vitányi 2013 Thm 2)"
@@ -90,6 +139,7 @@ def gap_K_chainRule_pair : GapEntry := {
   name := "K_chainRule_pair"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li-Vitányi 3rd ed. (2008) Thm 3.9.1 (symmetric-information chain " ++
     "rule, prefix-complexity version); plain-complexity analogue: " ++
@@ -109,6 +159,7 @@ def gap_K_pairNonDecrease : GapEntry := {
   name := "K_pairNonDecrease"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li-Vitányi 3rd ed. (2008) §3.1 (immediate from prefix-free " ++
     "pair-decoding: K(x|z) ≤ K(⟨x,y⟩|z) + c)"
@@ -127,6 +178,7 @@ def gap_K_condMonotone : GapEntry := {
   name := "K_condMonotone"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li-Vitányi 3rd ed. (2008) §3.1 / §3.4 (prefix-`K` analogue of " ++
     "plain-`C` Ch 2 result; extra conditioning cannot raise prefix " ++
@@ -145,6 +197,7 @@ def gap_K_descLength : GapEntry := {
   name := "K_descLength"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Li-Vitányi 3rd ed. (2008) §2.1 (immediate consequence of the " ++
     "Invariance Theorem Thm 2.1.1 via the literal-output universal " ++
@@ -161,17 +214,25 @@ def gap_K_descLength : GapEntry := {
     "`descLen y` includes the self-delimiting overhead"
 }
 
-/-! ### Cat 3 atomic carriers (paper-novel primitives) -/
+/-! ### Cat 3 atomic carriers (paper-novel primitives, sub-type: carrier) -/
 
 /-- Distinguished observable `S*`. -/
 def gap_DistinguishedObs_carrier : GapEntry := {
   name := "DistinguishedObs"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.carrier
   paperSource :=
     "Li 2026, `\\label{thm:undecidable}` construction: fresh 0-ary " ++
     "predicate `S*` added to T_0 = Q in the adversarial extension"
-  attackHistory := []
+  attackHistory := [
+    "v6 reductionism Cat 1?: CLEAR-NO — Mathlib has no `W.Obs` " ++
+      "abstraction nor any directly-imported 'fresh 0-ary predicate' " ++
+      "primitive at this level of abstraction",
+    "v6 reductionism Cat 2?: CLEAR-NO — `S*` is the paper's specific " ++
+      "construction-internal fresh symbol; it is not the subject of any " ++
+      "external textbook theorem, only of paper-local stipulation"
+  ]
   scope :=
     "Typed primitive `DistinguishedObs W : W.Obs`.  Freshness " ++
     "(S* ∉ π(T_0)) is recorded in the separate atomic axiom " ++
@@ -183,11 +244,19 @@ def gap_H_e_Obs_carrier : GapEntry := {
   name := "H_e_Obs"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.carrier
   paperSource :=
     "Li 2026, `\\label{thm:undecidable}` construction: paper-stated " ++
     "`H_e := ∃t. T(e, 0, t)` (Kleene's T-predicate Σ⁰₁ sentence " ++
     "asserting machine `e` halts on input 0)"
-  attackHistory := []
+  attackHistory := [
+    "v6 reductionism Cat 1?: CLEAR-NO — Mathlib has " ++
+      "`Nat.Partrec.Code` but no `W.Obs`-embedded representation of " ++
+      "the H_e sentence at this abstraction level",
+    "v6 reductionism Cat 2?: CLEAR-NO — the SENTENCE H_e is standard " ++
+      "(Kleene's T-predicate) but its embedding as a member of the " ++
+      "paper's specific `W.Obs` is paper-novel, not external"
+  ]
   scope :=
     "Typed primitive `H_e_Obs W : Code → W.Obs` encoding the paper's " ++
     "L_0-sentence H_e on the right-hand side of the defining " ++
@@ -201,10 +270,18 @@ def gap_Bridge1b_T0_carrier : GapEntry := {
   name := "Bridge1b_T0"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.carrier
   paperSource :=
     "Li 2026, `\\label{thm:undecidable}` construction: abstract " ++
     "realisation of Robinson's Q as the base theory T_0"
-  attackHistory := []
+  attackHistory := [
+    "v6 reductionism Cat 1?: CLEAR-NO — Mathlib.ModelTheory does not " ++
+      "yet contain Robinson's Q as a concrete first-order theory at " ++
+      "the level this paper consumes",
+    "v6 reductionism Cat 2?: CLEAR-NO — Robinson's Q exists in external " ++
+      "literature (Smith 2013, TMR 1953, etc.) but the paper's `W.Th`- " ++
+      "level abstraction is paper-stipulated, not a direct import"
+  ]
   scope :=
     "Typed primitive `Bridge1b_T0 W : W.Th`"
 }
@@ -214,25 +291,38 @@ def gap_Bridge1b_Tstar_carrier : GapEntry := {
   name := "Bridge1b_Tstar"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.carrier
   paperSource :=
     "Li 2026, `\\label{thm:undecidable}` construction: abstract " ++
     "realisation of T*_e := Q ∪ {S* ↔ H_e} indexed by Code"
-  attackHistory := []
+  attackHistory := [
+    "v6 reductionism Cat 1?: CLEAR-NO — no Mathlib import for `T*_e`; " ++
+      "the construction T_0 ∪ {single defining axiom} is paper-stipulated",
+    "v6 reductionism Cat 2?: CLEAR-NO — the construction itself is " ++
+      "Li 2026's adversarial encoding; not an external named theorem"
+  ]
   scope :=
     "Typed primitive `Bridge1b_Tstar W : Code → W.Th`"
 }
 
-/-! ### Cat 3 atomic defining equations (paper-stated) -/
+/-! ### Cat 3 atomic defining equations (paper-stated, sub-type: structuralEquation) -/
 
 /-- (iii) `S*` is fresh in `T_0`. -/
 def gap_Bridge_Encoding_Sstar_T0 : GapEntry := {
   name := "Bridge_Encoding_Sstar_T0"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:undecidable}` proof: 'since S* does not " ++
     "occur in T_0's axioms, T_0 ⊬ S*, so S* ∉ π(T_0)'"
-  attackHistory := []
+  attackHistory := [
+    "v6 reductionism Cat 1?: CLEAR-NO — Mathlib cannot derive " ++
+      "`DistinguishedObs W ∉ W.predict (Bridge1b_T0 W)` since both " ++
+      "operands are Cat 3 paper-novel primitives",
+    "v6 reductionism Cat 2?: CLEAR-NO — this is the paper's specific " ++
+      "construction stipulation, not a standalone external theorem"
+  ]
   scope :=
     "`DistinguishedObs W ∉ W.predict (Bridge1b_T0 W)` — paper-novel " ++
     "freshness (clause iii)"
@@ -243,11 +333,18 @@ def gap_Bridge_H_e_distinct_from_Sstar : GapEntry := {
   name := "Bridge_H_e_distinct_from_Sstar"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:undecidable}` proof: 'Obs := {closed " ++
     "sentences in L_0} ∪ {S*} ... S* not occurring in the language " ++
     "of Q'.  H_e is an L_0-sentence, hence H_e ≠ S*"
-  attackHistory := []
+  attackHistory := [
+    "v6 reductionism Cat 1?: CLEAR-NO — distinctness of paper-novel " ++
+      "Cat 3 carriers cannot be derived in Mathlib",
+    "v6 reductionism Cat 2?: CLEAR-NO — this is the paper's atomic-" ++
+      "disjoint-union structure on `Obs = L_0 ∪ {S*}`, a paper-specific " ++
+      "stipulation"
+  ]
   scope :=
     "`∀ e, H_e_Obs W e ≠ DistinguishedObs W`.  Side-condition needed " ++
     "to specialise `Bridge_DefExt_Conservative` (universally " ++
@@ -259,11 +356,21 @@ def gap_Bridge_Defining_Biconditional : GapEntry := {
   name := "Bridge_Defining_Biconditional"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
     "Li 2026, `\\label{thm:undecidable}` proof: 'In T*_e, the axiom " ++
     "S* ↔ H_e gives T*_e ⊢ S* iff T*_e ⊢ H_e' — paper-novel Step 1 " ++
     "atomic claim (modus ponens on the defining axiom)"
-  attackHistory := []
+  attackHistory := [
+    "v6 reductionism Cat 1?: CLEAR-NO — `S* ∈ π(T*_e) ↔ H_e ∈ π(T*_e)` " ++
+      "is a property of the paper-novel `Bridge1b_Tstar` carrier; not " ++
+      "Mathlib-derivable",
+    "v6 reductionism Cat 2?: CLEAR-NO — modus ponens on a defining " ++
+      "biconditional is a standard FO inference, but its application to " ++
+      "the paper-specific S*-↔-H_e construction is paper-novel; the " ++
+      "abstract claim at the `W.Obs / W.Th` level cannot be 'imported' " ++
+      "from an external theorem"
+  ]
   scope :=
     "`∀ e, S* ∈ π(T*_e) ↔ H_e_Obs e ∈ π(T*_e)`.  Step 1 only; the " ++
     "textbook conservativity link (T*_e ⊢ H_e ↔ Q ⊢ H_e, Step 2) " ++
@@ -278,6 +385,7 @@ def gap_Bridge_Q_Sigma01_completeness : GapEntry := {
   name := "Bridge_Q_Sigma01_completeness"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Smith, *An Introduction to Gödel's Theorems*, 2nd ed., " ++
     "Cambridge UP 2013, Ch 11 'What Q can prove', §'Q is Σ₁-complete' " ++
@@ -305,6 +413,7 @@ def gap_Bridge_Q_Sigma01_soundness : GapEntry := {
   name := "Bridge_Q_Sigma01_soundness"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Tarski-Mostowski-Robinson, *Undecidable Theories*, North-Holland " ++
     "1953, Ch II (Q's axiomatization) + Smith 2013 §10.1-10.2 " ++
@@ -321,8 +430,7 @@ def gap_Bridge_Q_Sigma01_soundness : GapEntry := {
   scope :=
     "`∀ e, H_e_Obs W e ∈ W.predict (Bridge1b_T0 W) → Halt(e)`.  " ++
     "Strictly atomic split (`N_models_Q` + `Sigma01_soundness_of_-" ++
-    "FO_derivation`) deferred to Mathlib FO formalisation; see " ++
-    "`gap_FOTheory_encoding_BLOCKED`"
+    "FO_derivation`) deferred to Mathlib FO formalisation"
 }
 
 /-- Conservativity of definitional extension outside `S*`. -/
@@ -330,6 +438,7 @@ def gap_Bridge_DefExt_Conservative : GapEntry := {
   name := "Bridge_DefExt_Conservative"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Shoenfield, *Mathematical Logic*, Addison-Wesley 1967, §4.6 " ++
     "'Extensions by definitions' (p. 57f) — PRIMARY (theorem-numbered); " ++
@@ -347,6 +456,7 @@ def gap_Bridge_Tarski_RCF_Correctness : GapEntry := {
   name := "Bridge_Tarski_RCF_Correctness"
   status := GapStatus.gapOpen
   inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
   paperSource :=
     "Tarski, *A Decision Method for Elementary Algebra and Geometry*, " ++
     "RAND R-109, 1948 / UC Press 1951; quantifier-elimination " ++
@@ -362,61 +472,6 @@ def gap_Bridge_Tarski_RCF_Correctness : GapEntry := {
     "procedure as an opaque framework primitive"
 }
 
-/-! ### gapBlocked entries — Mathlib derivations deferred -/
-
-/-- Full Mathlib derivation of Kolmogorov complexity `K`. -/
-def gap_K_Mathlib_full_derivation_BLOCKED : GapEntry := {
-  name := "K_Mathlib_full_derivation"
-  status := GapStatus.gapBlocked
-  inputCategory := InputCategory.notInput
-  paperSource :=
-    "Mathlib has no `Mathlib.InformationTheory.Kolmogorov` module; " ++
-    "building one (universal prefix Turing machine + invariance " ++
-    "theorem + conditional coding theorem) is a substantial " ++
-    "separate project"
-  attackHistory := []
-  scope :=
-    "Full Lean proofs of the 5 KC bridges as theorems against a " ++
-    "concrete prefix-machine framework.  Deferred; the bridges " ++
-    "remain Cat 2 atomic external-published axioms"
-}
-
-/-- Full FO theory encoding via `Mathlib.ModelTheory`. -/
-def gap_FOTheory_encoding_BLOCKED : GapEntry := {
-  name := "FOTheory_encoding_Mathlib"
-  status := GapStatus.gapBlocked
-  inputCategory := InputCategory.notInput
-  paperSource :=
-    "Mathlib.ModelTheory does not yet contain a formalisation of " ++
-    "Robinson's Q with its Σ⁰₁-completeness theorem, or the framework " ++
-    "for r.e.-axiomatised FO theories with conservativity of " ++
-    "definitional extension"
-  attackHistory := []
-  scope :=
-    "Full FO-encoding of T*_e := Q ∪ {S* ↔ H_e} as a Mathlib " ++
-    "FirstOrder.Language theory, with Σ⁰₁-completeness of Q, " ++
-    "soundness of FO derivation, conservativity of def-ext, and " ++
-    "Beth definability proved inside Mathlib.  Deferred; the three " ++
-    "atomic textbook bridges remain Cat 2 axioms"
-}
-
-/-- Full Tarski CAD algorithm in Lean. -/
-def gap_Tarski_CAD_Mathlib_BLOCKED : GapEntry := {
-  name := "Tarski_CAD_Mathlib"
-  status := GapStatus.gapBlocked
-  inputCategory := InputCategory.notInput
-  paperSource :=
-    "Mathlib does not contain a constructive Tarski / Collins " ++
-    "quantifier-elimination procedure for the FO theory of real- " ++
-    "closed fields with a machine-checked correctness proof.  See " ++
-    "Basu-Pollack-Roy 2006 for the algorithmic content"
-  attackHistory := []
-  scope :=
-    "Full constructive Tarski CAD inside Lean with machine-checked " ++
-    "correctness against standard RCF semantics.  Deferred; " ++
-    "`Bridge_Tarski_RCF_Correctness` remains a Cat 2 atomic axiom"
-}
-
 /-! ### gapClosed entries — top-level theorems proven without `sorry` -/
 
 /-- Theorem 1: empirical-verification wall-clock floor. -/
@@ -424,6 +479,7 @@ def gap_thm_floor_CLOSED : GapEntry := {
   name := "thm_floor"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:floor}`"
   attackHistory := []
   scope :=
@@ -438,6 +494,7 @@ def gap_thm_emission_CLOSED : GapEntry := {
   name := "thm_emission"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:emission}`"
   attackHistory := []
   scope :=
@@ -451,6 +508,7 @@ def gap_cor_rare_CLOSED : GapEntry := {
   name := "cor_rare"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{cor:rare}`"
   attackHistory := []
   scope :=
@@ -463,6 +521,7 @@ def gap_rem_emission_not_impossible_CLOSED : GapEntry := {
   name := "rem_emission_not_impossible"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{rem:emission-not-impossible}`"
   attackHistory := []
   scope :=
@@ -475,6 +534,7 @@ def gap_thm_undecidable_sigma01_hard_CLOSED : GapEntry := {
   name := "thm_undecidable_sigma01_hard"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:undecidable}` clause (i)"
   attackHistory := []
   scope :=
@@ -490,6 +550,7 @@ def gap_thm_undecidable_sigma02_upper_CLOSED : GapEntry := {
   name := "thm_undecidable_sigma02_upper"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:undecidable}` clause (i) upper bound"
   attackHistory := []
   scope :=
@@ -503,6 +564,7 @@ def gap_thm_undecidable_tarski_decidable_CLOSED : GapEntry := {
   name := "thm_undecidable_tarski_decidable"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:undecidable}` clause (ii)"
   attackHistory := [
     "v0.3: strengthened from trivial `∃ b, RCFDecide φ = b` to " ++
@@ -519,6 +581,7 @@ def gap_cor_no_universal_CLOSED : GapEntry := {
   name := "cor_no_universal"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{cor:no-universal}`"
   attackHistory := []
   scope :=
@@ -533,6 +596,7 @@ def gap_thm_self_verification_CLOSED : GapEntry := {
   name := "thm_self_verification"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:self-verification}`"
   attackHistory := []
   scope :=
@@ -547,6 +611,7 @@ def gap_cor_empirical_necessity_CLOSED : GapEntry := {
   name := "cor_empirical_necessity"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{cor:empirical-necessity}`"
   attackHistory := []
   scope :=
@@ -559,6 +624,7 @@ def gap_thm_decomposition_CLOSED : GapEntry := {
   name := "thm_decomposition"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{thm:decomposition}`"
   attackHistory := []
   scope :=
@@ -572,6 +638,7 @@ def gap_cor_conditional_feasibility_CLOSED : GapEntry := {
   name := "cor_conditional_feasibility"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{cor:conditional-feasibility}`"
   attackHistory := []
   scope :=
@@ -584,6 +651,7 @@ def gap_cor_bound_interaction_CLOSED : GapEntry := {
   name := "cor_bound_interaction"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
   paperSource := "Li 2026, `\\label{cor:bound-interaction}`"
   attackHistory := []
   scope :=
@@ -615,10 +683,6 @@ def allGaps : List GapEntry := [
   gap_Bridge_Q_Sigma01_soundness,
   gap_Bridge_DefExt_Conservative,
   gap_Bridge_Tarski_RCF_Correctness,
-  -- gapBlocked
-  gap_K_Mathlib_full_derivation_BLOCKED,
-  gap_FOTheory_encoding_BLOCKED,
-  gap_Tarski_CAD_Mathlib_BLOCKED,
   -- gapClosed top-level results
   gap_thm_floor_CLOSED,
   gap_thm_emission_CLOSED,
@@ -654,17 +718,31 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
   , countWhere InputCategory.cat3PaperNovel
   , countWhere InputCategory.notInput )
 
-#eval s!"EinsteinTest gap-ledger inventory (status):  open={(gapCounts).1} partial={(gapCounts).2.1} blocked={(gapCounts).2.2.1} deadEnd={(gapCounts).2.2.2.1} closed={(gapCounts).2.2.2.2}"
+/-- Cat3SubType-keyed counts:
+    `(carrier, hypothesisPredicate, structuralEquation, workingAssumption, conditionalHypothesis, notCat3)`. -/
+def cat3SubTypeCounts : Nat × Nat × Nat × Nat × Nat × Nat :=
+  let countWhere (s : Cat3SubType) : Nat :=
+    (allGaps.filter (fun g => g.cat3SubType = s)).length
+  ( countWhere Cat3SubType.carrier
+  , countWhere Cat3SubType.hypothesisPredicate
+  , countWhere Cat3SubType.structuralEquation
+  , countWhere Cat3SubType.workingAssumption
+  , countWhere Cat3SubType.conditionalHypothesis
+  , countWhere Cat3SubType.notCat3 )
 
-#eval s!"EinsteinTest gap-ledger inventory (input):   cat1Mathlib={(inputCategoryCounts).1} cat2External={(inputCategoryCounts).2.1} cat3PaperNovel={(inputCategoryCounts).2.2.1} notInput={(inputCategoryCounts).2.2.2}"
+#eval s!"EinsteinTest gap-ledger inventory (status):    open={(gapCounts).1} partial={(gapCounts).2.1} blocked={(gapCounts).2.2.1} deadEnd={(gapCounts).2.2.2.1} closed={(gapCounts).2.2.2.2}"
+
+#eval s!"EinsteinTest gap-ledger inventory (input):     cat1Mathlib={(inputCategoryCounts).1} cat2External={(inputCategoryCounts).2.1} cat3PaperNovel={(inputCategoryCounts).2.2.1} notInput={(inputCategoryCounts).2.2.2}"
+
+#eval s!"EinsteinTest gap-ledger inventory (Cat 3 sub): carrier={(cat3SubTypeCounts).1} hypothesisPredicate={(cat3SubTypeCounts).2.1} structuralEquation={(cat3SubTypeCounts).2.2.1} workingAssumption={(cat3SubTypeCounts).2.2.2.1} conditionalHypothesis={(cat3SubTypeCounts).2.2.2.2.1} notCat3={(cat3SubTypeCounts).2.2.2.2.2}"
 
 #eval s!"Total entries: {allGaps.length}"
 
 /-! ### Inventory summary
 
-  The live status counts and input-category counts are printed by the
-  `#eval` calls above (run `lake env lean EinsteinTest/Ledger.lean` to
-  see them).  The axiom names by category:
+  The live status / input-category / Cat 3 sub-type counts are printed
+  by the `#eval` calls above (run `lake env lean
+  EinsteinTest/Ledger.lean` to see them).  Axiom names by category:
 
     Cat 2 propositional (external published textbook):
       K_codingTheorem, K_chainRule_pair, K_pairNonDecrease,
@@ -672,14 +750,21 @@ def inputCategoryCounts : Nat × Nat × Nat × Nat :=
       Bridge_Q_Sigma01_completeness, Bridge_Q_Sigma01_soundness,
       Bridge_DefExt_Conservative
 
-    Cat 3 propositional defining equations (paper-stated atomic):
+    Cat 3 carriers (paper-novel typed primitives):
+      DistinguishedObs, H_e_Obs, Bridge1b_T0, Bridge1b_Tstar
+
+    Cat 3 structural defining equations (paper-stated atomic):
       Bridge_Encoding_Sstar_T0, Bridge_H_e_distinct_from_Sstar,
       Bridge_Defining_Biconditional
 
-    Cat 3 carrier axioms (paper-novel typed primitives):
-      DistinguishedObs, H_e_Obs, Bridge1b_T0, Bridge1b_Tstar
+  Cat 3 sub-types not used in this project: `hypothesisPredicate`
+  (paper has no scope/regime predicates beyond Definition-level
+  classes that are already concrete `def`s in `Basic.lean`),
+  `workingAssumption` (no provisional bundles), `conditionalHypothesis`
+  (no open-problem-conditional results).
 
-  Lean kernel (not declared here): propext, Classical.choice, Quot.sound.
+  Lean kernel (Cat 0; not declared here): propext, Classical.choice,
+  Quot.sound.
 -/
 
 end EinsteinTest.Ledger
