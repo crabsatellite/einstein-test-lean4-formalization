@@ -2,12 +2,17 @@
   EinsteinTest/Ledger.lean
 
   Gap ledger.  Every atomic axiom and every closed top-level result is
-  recorded as a typed `GapEntry` with three orthogonal classifications:
+  recorded as a typed `GapEntry` with three orthogonal classifications
+  plus a broken-link dependency list:
 
-    * 5-tier status:    gapOpen / gapPartial / gapBlocked / gapDeadEnd / gapClosed
+    * 6-tier status:    gapOpen / gapPartial / gapBlocked / gapDeadEnd /
+                        gapClosed / gapClosedConditional
     * 4-input-category: cat1Mathlib / cat2External / cat3PaperNovel / notInput
     * Cat 3 sub-type:   carrier / hypothesisPredicate / structuralEquation /
                         workingAssumption / conditionalHypothesis / notCat3
+    * conditionalOn :   list of `Hyp_*` broken-link predicate names
+                        (non-empty iff status is `gapClosedConditional`;
+                        see v6 §12)
 
   Pre-attack discipline.  Scan this ledger before launching new
   attacks.  Re-attempting a `gapBlocked` or `gapDeadEnd` route is a
@@ -33,13 +38,19 @@ import EinsteinTest
 
 namespace EinsteinTest.Ledger
 
-/-- 5-tier status tag attached to each gap. -/
+/-- 6-tier status tag attached to each gap.  `gapClosedConditional`
+    is used when Phase 4 catches a defect breaking a typed-bridge
+    chain: the downstream closure is preserved as conditional on a
+    named `Hyp_*` broken-link hypothesis (recorded in the entry's
+    `conditionalOn` field) pending repair or independent derivation.
+    See `feedback_gap_ledger_in_lean4` §12. -/
 inductive GapStatus
   | gapOpen
   | gapPartial
   | gapBlocked
   | gapDeadEnd
   | gapClosed
+  | gapClosedConditional
   deriving DecidableEq, Repr
 
 /-- 4-input-category tag attached to each gap.  Orthogonal to status.
@@ -90,7 +101,7 @@ inductive Cat3SubType
 structure GapEntry where
   /-- Identifier matching the underlying axiom / theorem name. -/
   name : String
-  /-- 5-tier status. -/
+  /-- 6-tier status. -/
   status : GapStatus
   /-- Input category (orthogonal to status). -/
   inputCategory : InputCategory
@@ -105,6 +116,10 @@ structure GapEntry where
   attackHistory : List String
   /-- What content the entry carries; what it does NOT claim. -/
   scope : String
+  /-- Names of `Hyp_*` broken-link predicates this entry's proof
+      depends on.  Invariant: non-empty iff `status =
+      gapClosedConditional`.  See v6 §12. -/
+  conditionalOn : List String := []
 
 /-! ### Cat 2 atomic KC bridges (Li-Vitányi 3rd ed. 2008 + Vitányi 2013 TCS 501) -/
 
@@ -699,15 +714,17 @@ def allGaps : List GapEntry := [
   gap_cor_bound_interaction_CLOSED
 ]
 
-/-- Status-keyed counts: `(open, partial, blocked, deadEnd, closed)`. -/
-def gapCounts : Nat × Nat × Nat × Nat × Nat :=
+/-- Status-keyed counts:
+    `(open, partial, blocked, deadEnd, closed, closedConditional)`. -/
+def gapCounts : Nat × Nat × Nat × Nat × Nat × Nat :=
   let countWhere (s : GapStatus) : Nat :=
     (allGaps.filter (fun g => g.status = s)).length
   ( countWhere GapStatus.gapOpen
   , countWhere GapStatus.gapPartial
   , countWhere GapStatus.gapBlocked
   , countWhere GapStatus.gapDeadEnd
-  , countWhere GapStatus.gapClosed )
+  , countWhere GapStatus.gapClosed
+  , countWhere GapStatus.gapClosedConditional )
 
 /-- InputCategory-keyed counts: `(cat1Mathlib, cat2External, cat3PaperNovel, notInput)`. -/
 def inputCategoryCounts : Nat × Nat × Nat × Nat :=
@@ -730,7 +747,7 @@ def cat3SubTypeCounts : Nat × Nat × Nat × Nat × Nat × Nat :=
   , countWhere Cat3SubType.conditionalHypothesis
   , countWhere Cat3SubType.notCat3 )
 
-#eval s!"EinsteinTest gap-ledger inventory (status):    open={(gapCounts).1} partial={(gapCounts).2.1} blocked={(gapCounts).2.2.1} deadEnd={(gapCounts).2.2.2.1} closed={(gapCounts).2.2.2.2}"
+#eval s!"EinsteinTest gap-ledger inventory (status):    open={(gapCounts).1} partial={(gapCounts).2.1} blocked={(gapCounts).2.2.1} deadEnd={(gapCounts).2.2.2.1} closed={(gapCounts).2.2.2.2.1} closedConditional={(gapCounts).2.2.2.2.2}"
 
 #eval s!"EinsteinTest gap-ledger inventory (input):     cat1Mathlib={(inputCategoryCounts).1} cat2External={(inputCategoryCounts).2.1} cat3PaperNovel={(inputCategoryCounts).2.2.1} notInput={(inputCategoryCounts).2.2.2}"
 
