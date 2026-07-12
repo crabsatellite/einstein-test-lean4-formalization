@@ -1,27 +1,28 @@
 /-
   EinsteinTest.lean
 
-  Root module. Machine-checked formalization of the five theorems
-  and four corollaries of:
+  Root module for the audited formal support of:
 
     Li, Alex. "What the Karpowicz Theorem Does Not Prove:
-              A Three-Component Decomposition of the LLM Einstein Test."
+              A Three-Resource Theory of the LLM Einstein Test."
               2026.
 
   Submodules:
-    EinsteinTest/Basic.lean             Defs 1–4 (observational world,
-                                        Einstein-replacement (E1)/(E2)/(E3),
-                                        generator+verifier, Einstein Test)
+    EinsteinTest/Basic.lean             Abstract observational layer,
+                                        candidate E1/E2 conditions,
+                                        strict verifier, resource vector
     EinsteinTest/Floor.lean             Theorem~\ref{thm:floor}
-    EinsteinTest/Emission.lean          Theorem~\ref{thm:emission} + cor:rare
-    EinsteinTest/Undecidable.lean       Theorem~\ref{thm:undecidable} + cor:no-universal
-    EinsteinTest/Decomposition.lean     Theorem~\ref{thm:decomposition} + cor:bound-interaction
-    EinsteinTest/SelfVerification.lean  Theorem~\ref{thm:self-verification} + cor:self-verif-robust
+    EinsteinTest/Emission.lean          Theorem~\ref{thm:emission} + cor:waiting
+    EinsteinTest/Undecidable.lean       Broad Dist + E1--E2 candidate recognition
+    EinsteinTest/Decomposition.lean     Pareto/scalar resource geometry
+    EinsteinTest/Dynamic.lean           Availability--acquisition path and floor
+    EinsteinTest/Feasibility.lean       Strict-witness compositional sufficiency
+    EinsteinTest/SelfVerification.lean  Strict-refutation no-certification result
 
   Soundness audit:
     EinsteinTest/AxiomAudit.lean — prints axiom dependencies of every
-    paper-level theorem. Expected: only `propext`, `Classical.choice`,
-    `Quot.sound`, plus the explicitly declared `K_*` Kolmogorov bridges.
+    retained theorem.  The KC and broad-class recursion layers use
+    explicitly inventoried external and construction bridges.
 
   Gap ledger:
     EinsteinTest/Ledger.lean — typed record of every atomic axiom,
@@ -42,4 +43,6 @@ import EinsteinTest.Floor
 import EinsteinTest.Emission
 import EinsteinTest.Undecidable
 import EinsteinTest.Decomposition
+import EinsteinTest.Dynamic
+import EinsteinTest.Feasibility
 import EinsteinTest.SelfVerification

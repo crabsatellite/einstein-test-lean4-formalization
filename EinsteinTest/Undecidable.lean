@@ -1,10 +1,9 @@
 /-
   EinsteinTest/Undecidable.lean
 
-  Theorem~\ref{thm:undecidable} (Distinguishability is Σ⁰₁-hard on
+  Theorem~\ref{thm:dist} (Distinguishability is Σ⁰₁-hard on
   recursively axiomatised classes containing Robinson Q; decidable on
-  the Tarski class), Corollary~\ref{cor:no-universal}, and
-  Remark~\ref{rem:adversarial-not-E3}.
+  an abstract RCF-represented class).
 
   Construction.  For each Turing machine code `e`, let
   `T*_e := Q ∪ {S* ↔ H_e}` where `S*` is a fresh 0-ary predicate
@@ -21,12 +20,13 @@
   (§16.2), distinct from standard Robinson's Q (BBJ's §16.4 "R");
   we therefore cite Smith / Hájek-Pudlák / TMR throughout.
 
-  Adversarial-not-E3 caveat.  `T*_e` is by construction a
-  definitional extension of `T_0 = Q` (via S* ↔ H_e), so it fails
-  (E3) by Beth's theorem.  Theorem 3 is a result about `Dist` on
-  r.e.-axiomatised classes, not specifically about Einstein-Test
-  verifiers; Cor `no-universal` transfers the lower bound to any
-  super-family of Dist-deciders.
+  Candidate-recognition boundary. At the empty data snapshot, E1 is
+  vacuous and the construction satisfies the E1--E2 candidate predicate
+  iff the machine halts; this yields the paper's candidate-recognition
+  hardness theorem.  It does not yield promised-candidate verification
+  hardness: non-halting instances fall outside E2, and the definitional
+  extension fails the strengthened E3 screen.  A promise-preserving
+  reduction would require both yes and no instances to remain in-domain.
 
   Lean atomic axiom surface (per `feedback_gap_ledger_in_lean4`
   ATOMIC MINIMAL UNITS; full Mathlib FO-encoding of Robinson Q is
@@ -96,7 +96,7 @@ def Dist (W : ObservationalWorld) (T1 T2 : W.Th) : Prop :=
   without needing a `Nonempty` witness.
 
   Citation: Li 2026, *What the Karpowicz Theorem Does Not Prove*,
-  `\label{thm:undecidable}` construction.
+  `\label{thm:dist}` construction.
 -/
 
 /-- Distinguished observable `S*`: the fresh 0-ary predicate added
@@ -136,7 +136,7 @@ axiom Bridge1b_Tstar (W : ObservationalWorld) [REAxiomatised W] :
     (iv)    `T*_e ⊢ S*` iff `T*_e ⊢ H_e` (modus ponens on the
             defining axiom `S* ↔ H_e`).
 
-  Citation: Li 2026, `\label{thm:undecidable}` proof.
+  Citation: Li 2026, `\label{thm:dist}` proof.
 -/
 
 /-- (iii) `S*` is fresh in `T_0`: since `S*` does not occur in `T_0`'s
@@ -160,7 +160,7 @@ axiom Bridge_H_e_distinct_from_Sstar
 /-- (iv) Defining biconditional in `T*_e`: the axiom `S* ↔ H_e` of
     `T*_e` gives, by modus ponens, `T*_e ⊢ S*` iff `T*_e ⊢ H_e`.
     At the abstract `W.Obs / W.Th` level (where `π` is the
-    syntactic provability map per the paper's thm:undecidable
+    syntactic provability map per the paper's thm:dist
     hypothesis), this is `S* ∈ π(T*_e) ↔ H_e ∈ π(T*_e)`.
 
     Paper-novel Step 1 only: the textbook conservativity link
@@ -266,6 +266,41 @@ theorem Bridge_Sstar_iff_Halt
     Bridge_Q_Sigma01_complete_sound W e
   exact hStep1.trans (hStep2.trans hStep3)
 
+/-- Operational candidate core (E2): `Tstar` makes at least one
+    prediction not made by `T0`.  At the empty data snapshot the E1
+    clauses are vacuous, so this is exactly paper predicate
+    `Cand_12(Tstar,T0; empty)`. -/
+def CandidateE2 (W : ObservationalWorld) (Tstar T0 : W.Th) : Prop :=
+  ∃ s, s ∈ W.predict Tstar ∧ s ∉ W.predict T0
+
+/-- On the adversarial family, E1--E2 candidate recognition is exactly
+    halting.  This is a recognition result, not a promise-preserving
+    verification-hardness theorem. -/
+theorem Bridge_Halt_Iff_CandidateE2
+    (W : ObservationalWorld) [REAxiomatised W] :
+    ∀ e, CandidateE2 W (Bridge1b_Tstar W e) (Bridge1b_T0 W) ↔
+      (Nat.Partrec.Code.eval e 0).Dom := by
+  intro e
+  constructor
+  · rintro ⟨s, hsStar, hsNot0⟩
+    by_cases hsEq : s = DistinguishedObs W
+    · exact (Bridge_Sstar_iff_Halt W e).mp (hsEq ▸ hsStar)
+    · exact absurd ((Bridge_DefExt_Conservative W e s hsEq).mp hsStar) hsNot0
+  · intro hHalt
+    exact ⟨DistinguishedObs W,
+      (Bridge_Sstar_iff_Halt W e).mpr hHalt,
+      Bridge_Encoding_Sstar_T0 W⟩
+
+/-- Paper Theorem `thm:candidate-recognition`: halting many-one reduces
+    to E1--E2 candidate recognition at the empty snapshot. -/
+theorem thm_candidate_recognition_sigma01_hard
+    (W : ObservationalWorld) [REAxiomatised W] :
+    ∃ (encode : Nat.Partrec.Code → W.Th × W.Th),
+      ∀ e, CandidateE2 W (encode e).1 (encode e).2 ↔
+        (Nat.Partrec.Code.eval e 0).Dom := by
+  exact ⟨fun e => (Bridge1b_Tstar W e, Bridge1b_T0 W),
+    Bridge_Halt_Iff_CandidateE2 W⟩
+
 /-- Halt-iff-Dist reduction: there exists a uniformly-computable
     encoding `e ↦ (T*_e, T_0)` under which `Dist(T*_e, T_0) ↔ Halt(e)`.
 
@@ -343,7 +378,7 @@ axiom Bridge_Tarski_RCF_Correctness :
 
 /-! ### Theorems. -/
 
-/-- **Theorem~\ref{thm:undecidable} (i) upper bound: Σ⁰₂.**
+/-- **Theorem~\ref{thm:dist} (i) upper bound: Σ⁰₂.**
 
     `Dist(T_1, T_2)` is equivalent to `∃ S` separating the prediction
     sets, an `∃ (Σ⁰₁ ∧ Π⁰₁)` claim of complexity `Σ⁰₂`.
@@ -371,7 +406,7 @@ theorem thm_undecidable_sigma02_upper (W : ObservationalWorld) (T1 T2 : W.Th) :
     · exact hNotIn2 (hEq ▸ hIn1)
     · exact hNotIn1 (hEq.symm ▸ hIn2)
 
-/-- **Theorem~\ref{thm:undecidable} (i): Σ⁰₁-hardness of `Dist`.**
+/-- **Theorem~\ref{thm:dist} (i): Σ⁰₁-hardness of `Dist`.**
 
     On any r.e.-axiomatised class extending Robinson `Q`, `Dist` is
     Σ⁰₁-hard: there is a computable encoding under which `Dist` is
@@ -382,7 +417,7 @@ theorem thm_undecidable_sigma01_hard
       ∀ e, Dist W (encode e).1 (encode e).2 ↔ (Nat.Partrec.Code.eval e 0).Dom :=
   Bridge_Halt_Iff_Dist W
 
-/-- **Theorem~\ref{thm:undecidable} (ii): Tarski-class decidability.**
+/-- **Theorem~\ref{thm:dist} (ii): Tarski-class decidability.**
 
     On the Tarski class `Θ^N` (theories whose prediction set is the
     solution set of a first-order formula over the real-closed-field

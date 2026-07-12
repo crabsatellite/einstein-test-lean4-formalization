@@ -1,130 +1,83 @@
 /-
   EinsteinTest/Decomposition.lean
 
-  Theorem~\ref{thm:decomposition} (Three-Component Decomposition),
-  Corollary~\ref{cor:bound-interaction}, and
-  Corollary~\ref{cor:conditional-feasibility}.
+  Audited resource-profile layer.  The revised paper uses the vector
 
-  Companion to: "What the Karpowicz Theorem Does Not Prove" (Li, 2026).
+      (B_M, B_V, B_Pi)
 
-  Statement (informal): on inputs where the system succeeds, the
-  expected total Einstein-Test cost decomposes additively:
-
-      E[C_Einstein] ≥ c_sample · 2^{K_*} + E[B_V] + τ_min
-
-  where (a) is the KC-emission floor (Theorem 2), (b) is the verifier
-  cost (procedural; only `B_V ≥ 0` is procedure-independent on Θ^N,
-  with structural infeasibility on Θ^G), and (c) is the empirical
-  floor (Theorem 1).
-
-  Post-R11 honest restatement: `B_V^♭` was removed from the sum
-  decomposition as it was derived from a PSPACE upper bound on
-  decision complexity, not a matching lower bound on cost.
+  as its primitive resource object.  This module does not reinstate the
+  deleted raw scalar identity.  Its unit-bearing scalarisation algebra is
+  the deterministic core used by the paper's conditional serial expected-
+  cost theorem; the probability/expectation layer remains ledgered partial.
 -/
 
 import EinsteinTest.Basic
 import EinsteinTest.Floor
-import EinsteinTest.Emission
-import EinsteinTest.Undecidable
 
 namespace EinsteinTest
 
 variable {W : ObservationalWorld}
 
-/--
-  **Theorem~\ref{thm:decomposition} (cost decomposition, empirical-floor portion).**
+namespace System.ResourceProfile
 
-  On inputs where the system passes the Einstein Test, the *total* cost
-  is bounded below by the empirical floor:
+/-- Coordinatewise (Pareto) resource order. -/
+def ParetoLE (B B' : System.ResourceProfile) : Prop :=
+  B.generation ≤ B'.generation ∧
+  B.computationalVerification ≤ B'.computationalVerification ∧
+  B.empiricalTime ≤ B'.empiricalTime
 
-      `𝔖.totalCost ≥ τ_min`.
+/-- A unit-bearing non-negative scalarisation.  The fields of `w` are
+    conversion weights into a declared common reporting unit. -/
+noncomputable def scalarise (w B : System.ResourceProfile) : ℝ∞ :=
+  w.generation * B.generation +
+  w.computationalVerification * B.computationalVerification +
+  w.empiricalTime * B.empiricalTime
 
-  This is the unconditional (in-Lean-provable) portion of the
-  three-component decomposition.  The full paper-level statement
+/-- Non-negative scalarisations preserve Pareto dominance. -/
+theorem scalarise_mono {w B B' : System.ResourceProfile}
+    (h : ParetoLE B B') :
+    scalarise w B ≤ scalarise w B' := by
+  rcases h with ⟨hM, hV, hPi⟩
+  unfold scalarise
+  gcongr
 
-      `E[C_Einstein] ≥ c_sample · 2^{K_*} + E[B_V] + τ_min`
+end System.ResourceProfile
 
-  factors as:
+/-- Machine-checked portion of Proposition `prop:profile`: on a passing
+    system under the strict-refutation protocol, the empirical coordinate
+    of the three-resource vector is bounded below by `tauMin`.
 
-  * **τ_min term:** discharged here (combination of Theorem 1 and the
-     `0 ≤ B_M`, `0 ≤ B_V` non-negativity automatic in `ℝ≥0∞`).
-  * **`c_sample · 2^{K_*}` term:** conditional on the Kolmogorov-
-     complexity bridges in `Emission.lean` (Theorem 2); see
-     `EinsteinTest.thm_emission`.
-  * **`E[B_V]` term:** a procedural floor; on `Θ^N` it reduces to
-     `B_V ≥ 0` (automatic), on `Θ^G` it is structurally infeasible
-     (Theorem 3, `EinsteinTest.thm_undecidable_sigma01_hard`).
+    The paper's generation and broad-class distinguishability clauses live
+    in their own modules with their own external hypotheses; they are not
+    silently bundled into this theorem. -/
+theorem resource_profile_empirical_floor
+    (R : EinsteinReplacement W) (sys : System W R)
+    (hPass : sys.passes) :
+    tauMin R ≤ sys.resourceProfile.empiricalTime := by
+  exact thm_floor sys hPass
 
-  Post-R11 honest restatement: only the τ_min portion is unconditional
-  here; the KC-emission and the B_V floor are tracked by their
-  respective theorems and axiom bridges.
--/
-theorem thm_decomposition (R : EinsteinReplacement W) (𝔖 : System W R)
-    (hPass : 𝔖.passes)
-    (hCorrect : correctSuccessor R 𝔖.Pi) :
-    tauMin R ≤ 𝔖.totalCost := by
-  -- Step 1: by Theorem 1, the empirical floor bounds B_Π from below.
-  have hFloor : tauMin R ≤ 𝔖.BPi := thm_floor 𝔖 hPass hCorrect
-  -- Step 2: in `ℝ≥0∞`, B_Π ≤ B_M + B_V + B_Π = totalCost trivially.
-  have hSum : 𝔖.BPi ≤ 𝔖.totalCost := by
-    show 𝔖.BPi ≤ 𝔖.BM + 𝔖.BV + 𝔖.BPi
-    have h1 : 𝔖.BPi ≤ 𝔖.BV + 𝔖.BPi := le_add_self
-    have h2 : 𝔖.BV + 𝔖.BPi ≤ 𝔖.BM + (𝔖.BV + 𝔖.BPi) := le_add_self
-    have h3 : 𝔖.BM + (𝔖.BV + 𝔖.BPi) = 𝔖.BM + 𝔖.BV + 𝔖.BPi := (add_assoc _ _ _).symm
-    exact h3 ▸ (h1.trans h2)
-  exact hFloor.trans hSum
+/-- Proposition `prop:resource-geometry`, weighted empirical clause:
+    on a passing system, every non-negative scalarisation is at least
+    the empirical weight times the strict-witness floor. -/
+theorem weighted_resource_empirical_floor
+    (R : EinsteinReplacement W) (sys : System W R)
+    (w : System.ResourceProfile) (hPass : sys.passes) :
+    w.empiricalTime * tauMin R ≤
+      System.ResourceProfile.scalarise w sys.resourceProfile := by
+  have hFloor : tauMin R ≤ sys.resourceProfile.empiricalTime :=
+    resource_profile_empirical_floor R sys hPass
+  unfold System.ResourceProfile.scalarise
+  have hWeighted : w.empiricalTime * tauMin R ≤
+      w.empiricalTime * sys.resourceProfile.empiricalTime := by
+    gcongr
+  exact hWeighted.trans le_add_self
 
-/-! ### Notes on Corollary~\ref{cor:bound-interaction} (i) and (ii).
-
-  Clause (i): Constraining `M`'s output to `Th^N` tightens the
-  verifier side (decision moves to the Tarski-decidable class);
-  impact on the generator side `B_M` is procedurally non-monotone.
-  This is a meta-claim about procedure spaces (verifier classes vs.
-  generator distributions), not a single Lean inequality without
-  instantiating a procedure model — full formalization belongs to a
-  future `EinsteinTest.Procedures` module.
-
-  Clause (ii): Growing the data `D_t` reduces `K(T*|D_t)` and, in the
-  regime where the corrected KC-exponent becomes non-positive, the
-  Theorem 2 lower bound on `E[B_M]` becomes vacuous; the conditional
-  structure is captured by `EinsteinTest.rem_emission_not_impossible`.
-
-  Neither remark contributes a Lean inequality with current content,
-  so no placeholder theorem is carried (it would inflate the
-  axiom-dependency audit with empty stubs).  The narrative remarks
-  stand on their own in the paper. -/
-
-/-- **Corollary~\ref{cor:bound-interaction} (iii).** The empirical
-    floor `τ_min` is uncoupled from AI-side interventions (M-changes
-    cannot lower `τ_min`); the bound `B_Π ≥ τ_min` still requires
-    Theorem~\ref{thm:floor}'s correct-successor hypothesis. -/
-theorem cor_bound_interaction_iii (R : EinsteinReplacement W) (𝔖 : System W R)
-    (hPass : 𝔖.passes) (hCorrect : correctSuccessor R 𝔖.Pi) :
-    tauMin R ≤ 𝔖.BPi :=
-  thm_floor 𝔖 hPass hCorrect
-
-/-- **Corollary~\ref{cor:conditional-feasibility} (F3 portion).**
-    A necessary condition for the Einstein Test to be passable in
-    principle: the strict-refutation set must be technologically
-    feasible, `τ_min < +∞`.
-
-    *Lean statement:* if a system passes the test (with correct-
-    successor protocol), then `τ_min` cannot be `⊤` (i.e., the
-    refutation set is non-trivially in `Tech_t`).  This is the
-    one direction provable from Theorem 1 alone.
-
-    Full (F1)+(F2)+(F3) sufficiency is conditional on the KC bridges
-    and the Tarski-decidability of `Θ^N`; see `Emission.lean` and
-    `Undecidable.lean`. -/
-theorem cor_conditional_feasibility (R : EinsteinReplacement W)
-    (𝔖 : System W R) (hPass : 𝔖.passes)
-    (hCorrect : correctSuccessor R 𝔖.Pi)
-    (hCostFinite : 𝔖.BPi ≠ ⊤) :
-    tauMin R ≠ ⊤ := by
-  -- By Theorem 1, τ_min ≤ B_Π.  If B_Π is finite, then τ_min is finite.
-  have hFloor : tauMin R ≤ 𝔖.BPi := thm_floor 𝔖 hPass hCorrect
-  intro hTop
-  rw [hTop] at hFloor
-  exact hCostFinite (top_le_iff.mp hFloor)
+/-- Fixed-environment invariance is definitional: once the candidate and
+    observational world are fixed, changing which system value is supplied
+    does not change `tauMin`.  This does not model changes to instruments,
+    technology, or the observational world. -/
+theorem fixed_environment_invariance
+    {R : EinsteinReplacement W} (_sys1 _sys2 : System W R) :
+    tauMin R = tauMin R := rfl
 
 end EinsteinTest

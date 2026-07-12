@@ -1,12 +1,12 @@
 /-
   EinsteinTest/Basic.lean
 
-  Definitions 1–4 of the paper:
-    * Definition `def:obs-world`     — observational world (Obs, Th, π, Tech, τ, D)
-    * Definition `def:einstein-rep`  — Einstein-replacement: (E1), (E2), (E3)
-    * Definition `def:generator`     — generator M, verifier V with strict-refutation soundness
-    * Definition `def:emp-protocol`  — empirical protocol Π and its wall-clock cost B_Π
-    * Definition `def:einstein-test` — Einstein Test, total cost C_Einstein
+  Abstract definitions supporting the revised paper:
+    * observational world `(Obs, Th, π, Tech, τ, D)`;
+    * model-relative candidate with E1-T0, E1-T*, and positive E2;
+    * verifier with strict-refutation soundness;
+    * empirical protocol and its elapsed-time coordinate;
+    * three-resource vector `(B_M, B_V, B_Π)`.
 
   Companion to: "What the Karpowicz Theorem Does Not Prove" (Li, 2026).
 
@@ -101,28 +101,20 @@ lemma consistentWith_iff_dataConsistentWith (T : W.Th) (D : Set W.Obs) :
 
 end ObservationalWorld
 
-/-! ### Definition `def:einstein-rep`: Einstein-replacement (E1)/(E2)/(E3). -/
+/-! ### Definition `def:candidate`: model-relative Einstein candidate. -/
 
 /--
-  A theory `T*` is an *Einstein-replacement* of `T_0` at time `t` if:
+  A theory `T*` is a model-relative *Einstein candidate* for `T_0` at
+  time `t` if:
 
-  * **(E1) Backward compatibility:** `T_0` is consistent with the data
-          `D_t` accumulated by time `t`, i.e., `D_t ⊆ π(T_0)`.
-  * **(E2) Strict prediction divergence:** `π(T*) ≠ π(T_0)` — some
-          observable prediction differs.
-  * **(E3) Ontological innovation (Beth-definability):** `T*` extends
-          `T_0`'s vocabulary `L_0` by adding `k ≥ 1` primitive
-          non-logical symbols `σ_1, …, σ_k`, and at least one such
-          symbol `σ` is NOT FO-definable inside `T*` from `L_0`-vocabulary
-          alone. By Beth's theorem this is equivalent to the existence
-          of two `T*`-models whose `L_0`-reducts coincide but which
-          assign distinct interpretations to `σ`.
+  * **(E1-T0)** `T_0` is consistent with `D_t`.
+  * **(E1-T*)** `T*` is consistent with `D_t`.
+  * **(E2)** there is an observation in `π(T*) \ π(T_0)`.
 
-  The (E3) clause is an abstract Prop here; the recursion-theoretic
-  construction in `Undecidable.lean` will instantiate one specific
-  shape (single fresh 0-ary predicate `S*` with explicit defining
-  formula `H_e`), and Remark `adversarial-not-E3` notes that this
-  family fails (E3) by construction.
+  The paper's optional Beth non-definability novelty screen is not
+  represented by an unconstrained proposition.  A genuine encoding
+  requires first-order syntax, reducts, expansions, and definability;
+  this abstract observational layer intentionally omits it.
 -/
 structure EinsteinReplacement (W : ObservationalWorld) where
   /-- The base theory `T_0`. -/
@@ -131,17 +123,12 @@ structure EinsteinReplacement (W : ObservationalWorld) where
   Tstar : W.Th
   /-- The time-slice index `t`. -/
   t : ℝ
-  /-- **(E1)** `T_0` consistent with `D_t`. -/
-  E1 : W.consistentWith T0 (W.data t)
-  /-- **(E2)** `π(T*) ≠ π(T_0)`. -/
-  E2 : W.predict Tstar ≠ W.predict T0
-  /-- **(E3)** `T*` is not a definitional extension of `T_0` in the
-       Beth sense. Stated abstractly: there exists a primitive
-       non-logical symbol added by `T*` that is not FO-definable in
-       `T*` from `T_0`'s vocabulary. We carry this as a `Prop`-valued
-       parameter; constructive instances would witness the model
-       pair from Beth's theorem. -/
-  E3 : Prop
+  /-- **(E1-T0)** `T_0` is consistent with `D_t`. -/
+  E1_T0 : W.consistentWith T0 (W.data t)
+  /-- **(E1-T*)** `T*` is consistent with `D_t`. -/
+  E1_Tstar : W.consistentWith Tstar (W.data t)
+  /-- **(E2)** A positive strict-refutation observation exists. -/
+  E2 : ∃ s, s ∈ W.predict Tstar ∧ s ∉ W.predict T0
 
 namespace EinsteinReplacement
 
@@ -154,6 +141,12 @@ variable {W : ObservationalWorld} (R : EinsteinReplacement W)
 -/
 def refutationSet : Set W.Obs :=
   W.predict R.Tstar \ W.predict R.T0
+
+/-- Candidate condition (E2) is exactly non-emptiness of the strict
+    refutation set. -/
+lemma refutationSet_nonempty : R.refutationSet.Nonempty := by
+  obtain ⟨s, hsStar, hs0⟩ := R.E2
+  exact ⟨s, hsStar, hs0⟩
 
 /-- Strict refutations live outside `π(T_0)`. -/
 lemma refutationSet_disjoint_T0 :
@@ -181,7 +174,7 @@ lemma data_disjoint_refutationSet :
   ext s
   simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and]
   intro hData hRef
-  exact hRef.2 (R.E1 hData)
+  exact hRef.2 (R.E1_T0 hData)
 
 end EinsteinReplacement
 
@@ -236,6 +229,18 @@ lemma Verifier.sound_b_from_sound_c {W : ObservationalWorld} (V : Verifier W)
     ∃ S ∈ D, S ∉ W.predict T0 := by
   obtain ⟨S, hS_in_D, _, hS_not_in_T0⟩ := V.sound_c hCert
   exact ⟨S, hS_in_D, hS_not_in_T0⟩
+
+/-- A verifier is complete for represented strict-refutation witnesses
+    for a fixed theory pair when every successor-consistent data set
+    containing such a witness is accepted.  This is deliberately a
+    separate predicate from soundness: a verifier may be sound by never
+    accepting, whereas the finite-feasibility theorem needs both. -/
+def Verifier.strictCompleteFor {W : ObservationalWorld} (V : Verifier W)
+    (Tstar T0 : W.Th) : Prop :=
+  ∀ D : Set W.Obs,
+    D ⊆ W.predict Tstar →
+    (∃ S ∈ D, S ∈ W.predict Tstar ∧ S ∉ W.predict T0) →
+    V.decide Tstar T0 D = some true
 
 /-! ### Definition `def:emp-protocol`: Empirical protocol. -/
 
@@ -293,19 +298,17 @@ end EmpiricalProtocol
   * a verifier `V : Verifier W`,
   * an empirical protocol `Pi : EmpiricalProtocol W t`,
 
-  together with cost budgets `(B_M, B_V, B_Π) ∈ ℝ∞³`. The system
-  *passes the Einstein Test* on an Einstein-replacement candidate `R`
+  together with separately reported resource coordinates
+  `(B_M, B_V, B_Π) ∈ ℝ∞³`. The system
+  *passes the Einstein Test* on a model-relative candidate `R`
   iff
   *  `Mout = R.Tstar`,
   *  `Pi.augmentedData ⊆ π(Mout)`,
-  *  `V.decide Mout R.T0 Pi.augmentedData = some true`,
-  *  the realized cost is bounded by the corresponding budget for each
-    component.
+  *  `V.decide Mout R.T0 Pi.augmentedData = some true`.
 
-  Total cost: `C_Einstein = B_M + B_V + B_Π` (additive composition
-  convention of Def `def:einstein-test`; parallel resources would
-  give the `max` form — flagged here for cross-reference with
-  Theorem~\ref{thm:decomposition}).
+  The coordinates are a vector.  The revised paper does not add raw
+  computational resources and elapsed empirical time without an
+  explicit scalarisation rule.
 -/
 structure System (W : ObservationalWorld) (R : EinsteinReplacement W) where
   /-- Generator output `M(p)`. -/
@@ -314,20 +317,27 @@ structure System (W : ObservationalWorld) (R : EinsteinReplacement W) where
   V : Verifier W
   /-- Empirical protocol at the candidate's time slice. -/
   Pi : EmpiricalProtocol W R.t
-  /-- Generator-side budget. -/
+  /-- Reported generator-side resource use. -/
   BM : ℝ∞
-  /-- Verifier-side budget. -/
+  /-- Reported computational-verifier resource use. -/
   BV : ℝ∞
 
 namespace System
 
 variable {W : ObservationalWorld} {R : EinsteinReplacement W} (𝔖 : System W R)
 
-/-- Empirical-side budget. -/
+/-- Empirical elapsed-time coordinate. -/
 noncomputable def BPi : ℝ∞ := 𝔖.Pi.cost
 
-/-- Total cost `C_Einstein = B_M + B_V + B_Π`. -/
-noncomputable def totalCost : ℝ∞ := 𝔖.BM + 𝔖.BV + 𝔖.BPi
+/-- The paper's primary three-resource vector. -/
+structure ResourceProfile where
+  generation : ℝ∞
+  computationalVerification : ℝ∞
+  empiricalTime : ℝ∞
+
+/-- Resource profile reported by a system. -/
+noncomputable def resourceProfile : ResourceProfile :=
+  ⟨𝔖.BM, 𝔖.BV, 𝔖.BPi⟩
 
 /--
   *Passes-the-test* predicate. The system passes Einstein Test on
@@ -335,11 +345,11 @@ noncomputable def totalCost : ℝ∞ := 𝔖.BM + 𝔖.BV + 𝔖.BPi
 
   * generator outputs the successor (`Mout = R.Tstar`),
   * the protocol's augmented data is consistent with the output,
-  * the verifier certifies `(Mout, T_0, augmentedData)` with `1`,
-  * all three budgets are respected.
+  * the verifier certifies `(Mout, T_0, augmentedData)` with `1`.
 
-  Used in Theorem~\ref{thm:decomposition} clause (c) and Corollary
-  `cor:empirical-necessity`.
+  Resource coordinates are recorded separately and are not part of
+  this logical pass predicate.  The predicate is used by the empirical
+  floor and no-certification results.
 -/
 def passes : Prop :=
   𝔖.Mout = R.Tstar ∧

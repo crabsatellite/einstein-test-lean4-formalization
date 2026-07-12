@@ -238,7 +238,7 @@ def gap_DistinguishedObs_carrier : GapEntry := {
   inputCategory := InputCategory.cat3PaperNovel
   cat3SubType := Cat3SubType.carrier
   paperSource :=
-    "Li 2026, `\\label{thm:undecidable}` construction: fresh 0-ary " ++
+    "Li 2026, `\\label{thm:dist}` construction: fresh 0-ary " ++
     "predicate `S*` added to T_0 = Q in the adversarial extension"
   attackHistory := [
     "v6 reductionism Cat 1?: CLEAR-NO — Mathlib has no `W.Obs` " ++
@@ -261,7 +261,7 @@ def gap_H_e_Obs_carrier : GapEntry := {
   inputCategory := InputCategory.cat3PaperNovel
   cat3SubType := Cat3SubType.carrier
   paperSource :=
-    "Li 2026, `\\label{thm:undecidable}` construction: paper-stated " ++
+    "Li 2026, `\\label{thm:dist}` construction: paper-stated " ++
     "`H_e := ∃t. T(e, 0, t)` (Kleene's T-predicate Σ⁰₁ sentence " ++
     "asserting machine `e` halts on input 0)"
   attackHistory := [
@@ -287,7 +287,7 @@ def gap_Bridge1b_T0_carrier : GapEntry := {
   inputCategory := InputCategory.cat3PaperNovel
   cat3SubType := Cat3SubType.carrier
   paperSource :=
-    "Li 2026, `\\label{thm:undecidable}` construction: abstract " ++
+    "Li 2026, `\\label{thm:dist}` construction: abstract " ++
     "realisation of Robinson's Q as the base theory T_0"
   attackHistory := [
     "v6 reductionism Cat 1?: CLEAR-NO — Mathlib.ModelTheory does not " ++
@@ -308,7 +308,7 @@ def gap_Bridge1b_Tstar_carrier : GapEntry := {
   inputCategory := InputCategory.cat3PaperNovel
   cat3SubType := Cat3SubType.carrier
   paperSource :=
-    "Li 2026, `\\label{thm:undecidable}` construction: abstract " ++
+    "Li 2026, `\\label{thm:dist}` construction: abstract " ++
     "realisation of T*_e := Q ∪ {S* ↔ H_e} indexed by Code"
   attackHistory := [
     "v6 reductionism Cat 1?: CLEAR-NO — no Mathlib import for `T*_e`; " ++
@@ -329,7 +329,7 @@ def gap_Bridge_Encoding_Sstar_T0 : GapEntry := {
   inputCategory := InputCategory.cat3PaperNovel
   cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
-    "Li 2026, `\\label{thm:undecidable}` proof: 'since S* does not " ++
+    "Li 2026, `\\label{thm:dist}` proof: 'since S* does not " ++
     "occur in T_0's axioms, T_0 ⊬ S*, so S* ∉ π(T_0)'"
   attackHistory := [
     "v6 reductionism Cat 1?: CLEAR-NO — Mathlib cannot derive " ++
@@ -350,7 +350,7 @@ def gap_Bridge_H_e_distinct_from_Sstar : GapEntry := {
   inputCategory := InputCategory.cat3PaperNovel
   cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
-    "Li 2026, `\\label{thm:undecidable}` proof: 'Obs := {closed " ++
+    "Li 2026, `\\label{thm:dist}` proof: 'Obs := {closed " ++
     "sentences in L_0} ∪ {S*} ... S* not occurring in the language " ++
     "of Q'.  H_e is an L_0-sentence, hence H_e ≠ S*"
   attackHistory := [
@@ -373,7 +373,7 @@ def gap_Bridge_Defining_Biconditional : GapEntry := {
   inputCategory := InputCategory.cat3PaperNovel
   cat3SubType := Cat3SubType.structuralEquation
   paperSource :=
-    "Li 2026, `\\label{thm:undecidable}` proof: 'In T*_e, the axiom " ++
+    "Li 2026, `\\label{thm:dist}` proof: 'In T*_e, the axiom " ++
     "S* ↔ H_e gives T*_e ⊢ S* iff T*_e ⊢ H_e' — paper-novel Step 1 " ++
     "atomic claim (modus ponens on the defining axiom)"
   attackHistory := [
@@ -391,6 +391,24 @@ def gap_Bridge_Defining_Biconditional : GapEntry := {
     "textbook conservativity link (T*_e ⊢ H_e ↔ Q ⊢ H_e, Step 2) " ++
     "is derived from Bridge_DefExt_Conservative at H_e using " ++
     "Bridge_H_e_distinct_from_Sstar"
+}
+
+/-- Strengthened optional novelty screen: genuine FO syntax, an ablation
+    operator, and prediction relevance are not yet represented in Lean. -/
+def gap_E3_ablation_relevance : GapEntry := {
+  name := "E3_ablation_relevance"
+  status := GapStatus.gapOpen
+  inputCategory := InputCategory.cat3PaperNovel
+  cat3SubType := Cat3SubType.hypothesisPredicate
+  paperSource :=
+    "Li 2026, Definition `def:candidate` clauses E3a--E3b"
+  attackHistory := [
+    "2026-07-12 contribution-maximisation revision: added prediction " ++
+      "relevance to block novelty-by-idle-symbol; no fake `E3 : Prop` restored"
+  ]
+  scope :=
+    "Requires first-order syntax, declared sigma-ablation, and a proof " ++
+      "that ablation removes at least one strict new prediction"
 }
 
 /-! ### Cat 2 atomic textbook axioms (recursion-theoretic + Tarski) -/
@@ -487,6 +505,27 @@ def gap_Bridge_Tarski_RCF_Correctness : GapEntry := {
     "procedure as an opaque framework primitive"
 }
 
+/-- Adaptive sequential-testing change-of-measure inequality. -/
+def gap_Bayesian_change_of_measure : GapEntry := {
+  name := "Bayesian_change_of_measure"
+  status := GapStatus.gapOpen
+  inputCategory := InputCategory.cat2External
+  cat3SubType := Cat3SubType.notCat3
+  paperSource :=
+    "Kaufmann, Cappe, and Garivier, Journal of Machine Learning " ++
+      "Research 16 (2016), Lemma 1: for an almost-surely finite " ++
+      "adaptive stopping time, expected sample counts times armwise " ++
+      "KL divergence dominate binary relative entropy of every " ++
+      "terminal event"
+  attackHistory := [
+    "2026-07-12 ambition-preserving reconstruction: replaced the " ++
+      "underspecified generic KL slogan by a cited adaptive testing theorem"
+  ]
+  scope :=
+    "External bridge used by paper Theorem thm:bayes-floor; not yet " ++
+      "encoded as a Lean probability theorem in this project"
+}
+
 /-! ### gapClosed entries — top-level theorems proven without `sorry` -/
 
 /-- Theorem 1: empirical-verification wall-clock floor. -/
@@ -524,24 +563,11 @@ def gap_cor_rare_CLOSED : GapEntry := {
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
   cat3SubType := Cat3SubType.notCat3
-  paperSource := "Li 2026, `\\label{cor:rare}`"
+  paperSource := "Li 2026, `\\label{cor:waiting}`"
   attackHistory := []
   scope :=
     "For `p ≤ 2^(-K_*)` with `K_* > 0`, `E[N] = 1/p ≥ 2^(K_*)`; " ++
     "pure real-arithmetic, no atomic axioms"
-}
-
-/-- Remark: vacuous when `K_* ≤ 0`. -/
-def gap_rem_emission_not_impossible_CLOSED : GapEntry := {
-  name := "rem_emission_not_impossible"
-  status := GapStatus.gapClosed
-  inputCategory := InputCategory.notInput
-  cat3SubType := Cat3SubType.notCat3
-  paperSource := "Li 2026, `\\label{rem:emission-not-impossible}`"
-  attackHistory := []
-  scope :=
-    "Three escape routes push `K_* ≤ 0`, making the cor_rare " ++
-    "bound vacuous"
 }
 
 /-- Theorem 3(i): Σ⁰₁-hardness of `Dist`. -/
@@ -550,7 +576,7 @@ def gap_thm_undecidable_sigma01_hard_CLOSED : GapEntry := {
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
   cat3SubType := Cat3SubType.notCat3
-  paperSource := "Li 2026, `\\label{thm:undecidable}` clause (i)"
+  paperSource := "Li 2026, `\\label{thm:dist}` clause (i)"
   attackHistory := []
   scope :=
     "Existence of a computable encoding `e ↦ (T*_e, T_0)` under " ++
@@ -560,13 +586,29 @@ def gap_thm_undecidable_sigma01_hard_CLOSED : GapEntry := {
     "`Bridge_Halt_Iff_Dist`"
 }
 
+/-- E1--E2 candidate recognition at the empty snapshot is Sigma01-hard. -/
+def gap_thm_candidate_recognition_CLOSED : GapEntry := {
+  name := "thm_candidate_recognition_sigma01_hard"
+  status := GapStatus.gapClosed
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, `\\label{thm:candidate-recognition}`"
+  attackHistory := [
+    "2026-07-12: salvaged a candidate-domain result without reviving the " ++
+      "invalid promised-verification transfer"
+  ]
+  scope :=
+    "At D=empty, E1 is vacuous and E2 for the adversarial pair is iff " ++
+      "halting; does not include E3 or promised-candidate verification"
+}
+
 /-- Theorem 3(i) Σ⁰₂-upper bound: pure logic. -/
 def gap_thm_undecidable_sigma02_upper_CLOSED : GapEntry := {
   name := "thm_undecidable_sigma02_upper"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
   cat3SubType := Cat3SubType.notCat3
-  paperSource := "Li 2026, `\\label{thm:undecidable}` clause (i) upper bound"
+  paperSource := "Li 2026, `\\label{thm:dist}` clause (i) upper bound"
   attackHistory := []
   scope :=
     "`Dist(T_1, T_2) ↔ ∃ S` separating observation; pure-logic " ++
@@ -580,7 +622,7 @@ def gap_thm_undecidable_tarski_decidable_CLOSED : GapEntry := {
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
   cat3SubType := Cat3SubType.notCat3
-  paperSource := "Li 2026, `\\label{thm:undecidable}` clause (ii)"
+  paperSource := "Li 2026, `\\label{thm:dist}` clause (ii)"
   attackHistory := [
     "v0.3: strengthened from trivial `∃ b, RCFDecide φ = b` to " ++
       "substantive `∃ b : Bool, b = true ↔ RCFSatisfies φ`"
@@ -606,72 +648,220 @@ def gap_cor_no_universal_CLOSED : GapEntry := {
     "`ComputablePred.halting_problem 0`"
 }
 
-/-- Theorem 5: self-verification impossibility. -/
-def gap_thm_self_verification_CLOSED : GapEntry := {
-  name := "thm_self_verification"
+/-- Proposition: no certification from incumbent-consistent data under
+    the strict-refutation rule. -/
+def gap_no_strict_refutation_certification_CLOSED : GapEntry := {
+  name := "no_strict_refutation_certification"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
   cat3SubType := Cat3SubType.notCat3
-  paperSource := "Li 2026, `\\label{thm:self-verification}`"
-  attackHistory := []
+  paperSource := "Li 2026, `\\label{prop:no-cert}`"
+  attackHistory := [
+    "2026-07-12 solidity audit: demoted from computability/oracle " ++
+      "impossibility to the exact strict-refutation data-set claim"
+  ]
   scope :=
-    "For any D ⊆ D_t consistent with T_0, no sound verifier V_M can " ++
-    "return 1 on (p, T*, T_0, D) for an Einstein-replacement T*; " ++
-    "robust to universal-compressor, true-arithmetic, halting-oracle, " ++
-    "and any-reasoner enhancements"
+    "For D ⊆ D_t ⊆ π(T_0), no verifier satisfying sound_c can " ++
+    "certify on D.  No computability or oracle claim is made"
 }
 
-/-- Corollary: empirical access is structurally necessary. -/
-def gap_cor_empirical_necessity_CLOSED : GapEntry := {
-  name := "cor_empirical_necessity"
+/-- Derived protocol consequence: a passing protocol contributes an
+    outcome outside the already recorded data. -/
+def gap_empirical_access_required_CLOSED : GapEntry := {
+  name := "empirical_access_required"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
   cat3SubType := Cat3SubType.notCat3
-  paperSource := "Li 2026, `\\label{cor:empirical-necessity}`"
+  paperSource := "Li 2026, `\\label{cor:empirical-access}`"
   attackHistory := []
   scope :=
-    "A system (M, V_M) with no empirical protocol Π cannot pass the " ++
-    "Einstein Test on any Einstein-replacement T*"
+    "If a strict-refutation system passes, Pi.outcomes is not a subset " ++
+    "of D_t"
 }
 
-/-- Theorem 4: three-component cost decomposition. -/
-def gap_thm_decomposition_CLOSED : GapEntry := {
-  name := "thm_decomposition"
+/-- Machine-checked empirical coordinate of the resource-profile
+    proposition. -/
+def gap_resource_profile_empirical_floor_CLOSED : GapEntry := {
+  name := "resource_profile_empirical_floor"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
   cat3SubType := Cat3SubType.notCat3
-  paperSource := "Li 2026, `\\label{thm:decomposition}`"
-  attackHistory := []
+  paperSource := "Li 2026, `\\label{prop:profile}` clause (iii)"
+  attackHistory := [
+    "2026-07-12 solidity audit: deleted scalar decomposition and false " ++
+      "feasibility sufficiency; retained only the matching empirical coordinate"
+  ]
   scope :=
-    "`C_Einstein = B_M + B_V + B_Π` with structurally distinct " ++
-    "floors (emission KC bound, computational class-dependent " ++
-    "obstruction, empirical wall-clock floor)"
+    "tauMin bounds the empiricalTime field of the vector resource " ++
+    "profile on a passing strict-refutation system"
 }
 
-/-- Corollary: conditional feasibility. -/
-def gap_cor_conditional_feasibility_CLOSED : GapEntry := {
-  name := "cor_conditional_feasibility"
+/-- Fixed-environment invariance, explicitly scoped to one world and
+    candidate. -/
+def gap_fixed_environment_invariance_CLOSED : GapEntry := {
+  name := "fixed_environment_invariance"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
   cat3SubType := Cat3SubType.notCat3
-  paperSource := "Li 2026, `\\label{cor:conditional-feasibility}`"
+  paperSource := "Li 2026, `\\label{cor:invariance}`"
   attackHistory := []
   scope :=
-    "(F1) ∧ (F2) ∧ (F3) sufficient for Einstein-Test feasibility " ++
-    "within finite budget"
+    "Definitional equality for two system values sharing the same " ++
+    "world and candidate; no technology-change claim"
 }
 
-/-- Corollary: bound interaction. -/
-def gap_cor_bound_interaction_CLOSED : GapEntry := {
-  name := "cor_bound_interaction"
+/-- Pareto dominance is preserved by non-negative scalarisation. -/
+def gap_scalarise_mono_CLOSED : GapEntry := {
+  name := "System.ResourceProfile.scalarise_mono"
   status := GapStatus.gapClosed
   inputCategory := InputCategory.notInput
   cat3SubType := Cat3SubType.notCat3
-  paperSource := "Li 2026, `\\label{cor:bound-interaction}`"
+  paperSource := "Li 2026, `\\label{prop:resource-geometry}`"
   attackHistory := []
   scope :=
-    "AI-side interventions can lower (a) + (b) but not (c); " ++
-    "τmin is uncoupled from any AI-side intervention"
+    "Coordinatewise resource dominance implies dominance under every " ++
+      "non-negative unit-bearing scalarisation"
+}
+
+/-- Weighted empirical clause of the reconstructed resource theorem. -/
+def gap_weighted_resource_floor_CLOSED : GapEntry := {
+  name := "weighted_resource_empirical_floor"
+  status := GapStatus.gapClosed
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, `\\label{prop:resource-geometry}`"
+  attackHistory := []
+  scope :=
+    "For a passing system, w_Pi * tauMin is at most the declared " ++
+      "weighted scalar cost; no raw heterogeneous-unit addition"
+}
+
+/-- Dynamic witness lower bound. -/
+def gap_dynamic_floor_CLOSED : GapEntry := {
+  name := "dynamic_floor_of_witness"
+  status := GapStatus.gapClosed
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, `\\label{thm:dynamic-floor}`"
+  attackHistory := []
+  scope :=
+    "A realised strict witness whose completion time is bounded by " ++
+      "elapsed protocol time yields dynamicTauMin <= elapsed"
+}
+
+/-- Technology dominance and frontier congruence. -/
+def gap_dynamic_monotonicity_CLOSED : GapEntry := {
+  name := "dynamic_tau_mono / dynamic_tau_congr"
+  status := GapStatus.gapClosed
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, `\\label{prop:technology-dominance}`"
+  attackHistory := []
+  scope :=
+    "Pointwise improvement on the strict-witness set weakly lowers the " ++
+      "dynamic floor; agreement on that set gives equality"
+}
+
+/-- Microfounded availability--acquisition technology dominance. -/
+def gap_dynamic_path_monotonicity_CLOSED : GapEntry := {
+  name := "path_completion_mono / dynamic_path_tau_mono"
+  status := GapStatus.gapClosed
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, `\\label{prop:technology-dominance}`"
+  attackHistory := [
+    "2026-07-12: replaced black-box completion comparison by explicit " ++
+      "availability preservation plus acquisition-time dominance"
+  ]
+  scope :=
+    "Every old feasible delayed start remains feasible and no slower; " ++
+      "therefore induced completion times and dynamicTauMin weakly fall"
+}
+
+/-- Verifier completeness converts a represented witness into acceptance. -/
+def gap_strict_witness_accepts_CLOSED : GapEntry := {
+  name := "strict_witness_accepts"
+  status := GapStatus.gapClosed
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, Definition `def:feasibility-certificate` clause F3"
+  attackHistory := []
+  scope :=
+    "Successor-consistent represented strict witness plus explicit " ++
+      "strictCompleteFor predicate implies verifier acceptance"
+}
+
+/-- Non-circular deterministic core of conditional feasibility. -/
+def gap_strict_witness_feasibility_CLOSED : GapEntry := {
+  name := "strict_witness_feasibility"
+  status := GapStatus.gapClosed
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, `\\label{thm:feasibility}` deterministic core"
+  attackHistory := [
+    "2026-07-12: replaces the old false F1-F3 shadow with an explicit " ++
+      "completeness predicate and represented-witness hypothesis"
+  ]
+  scope :=
+    "Target emission, successor-consistent augmented data, a represented " ++
+      "strict witness, and verifier completeness imply System.passes"
+}
+
+/-- Paper theorem is only partially machine-bound: probability amplification
+    and the union-bound confidence layer are not encoded in this project. -/
+def gap_thm_feasibility_PARTIAL : GapEntry := {
+  name := "thm_feasibility_probability_layer"
+  status := GapStatus.gapPartial
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, `\\label{thm:feasibility}`"
+  attackHistory := []
+  scope :=
+    "Lean checks the deterministic composition core; the finite-N/K " ++
+      "probability and coordinatewise-budget statement is paper-proved only"
+}
+
+/-- The Bayesian information-rate theorem is sourced and paper-proved but
+    not formalised in this Lean project. -/
+def gap_thm_bayes_floor_PARTIAL : GapEntry := {
+  name := "thm_bayes_floor"
+  status := GapStatus.gapPartial
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, `\\label{thm:bayes-floor}`"
+  attackHistory := []
+  scope :=
+    "Derives expected empirical time >= binary evidence / best information " ++
+      "rate from the external adaptive change-of-measure bridge"
+}
+
+
+/-- Full serial expected-cost decomposition is paper-proved; Lean checks
+    the deterministic weighted component aggregation but not expectation. -/
+def gap_thm_serial_decomposition_PARTIAL : GapEntry := {
+  name := "thm_serial_decomposition"
+  status := GapStatus.gapPartial
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, `\\label{thm:serial-decomposition}`"
+  attackHistory := []
+  scope :=
+    "Serial iid until-hit pipeline: E[C_w] >= w_M c_M/q + w_V L_V + " ++
+      "w_Pi tauMin; scalarise_mono checks only the deterministic algebra"
+}
+
+/-- Non-stationary independent search law is paper-proved but not encoded
+    in the current Lean probability layer. -/
+def gap_thm_nonstationary_search_PARTIAL : GapEntry := {
+  name := "thm_nonstationary_search"
+  status := GapStatus.gapPartial
+  inputCategory := InputCategory.notInput
+  cat3SubType := Cat3SubType.notCat3
+  paperSource := "Li 2026, `\\label{thm:nonstationary-search}`"
+  attackHistory := []
+  scope :=
+    "Independent changing generators: finite no-hit probability is a " ++
+      "product; divergent sum q_i is sufficient for eventual hit a.s."
 }
 
 /-! ### Aggregated ledger inventory -/
@@ -693,25 +883,37 @@ def allGaps : List GapEntry := [
   gap_Bridge_Encoding_Sstar_T0,
   gap_Bridge_H_e_distinct_from_Sstar,
   gap_Bridge_Defining_Biconditional,
+  gap_E3_ablation_relevance,
   -- Cat 2 atomic textbook axioms (recursion-theoretic + Tarski)
   gap_Bridge_Q_Sigma01_completeness,
   gap_Bridge_Q_Sigma01_soundness,
   gap_Bridge_DefExt_Conservative,
   gap_Bridge_Tarski_RCF_Correctness,
+  gap_Bayesian_change_of_measure,
   -- gapClosed top-level results
   gap_thm_floor_CLOSED,
   gap_thm_emission_CLOSED,
   gap_cor_rare_CLOSED,
-  gap_rem_emission_not_impossible_CLOSED,
   gap_thm_undecidable_sigma01_hard_CLOSED,
+  gap_thm_candidate_recognition_CLOSED,
   gap_thm_undecidable_sigma02_upper_CLOSED,
   gap_thm_undecidable_tarski_decidable_CLOSED,
   gap_cor_no_universal_CLOSED,
-  gap_thm_self_verification_CLOSED,
-  gap_cor_empirical_necessity_CLOSED,
-  gap_thm_decomposition_CLOSED,
-  gap_cor_conditional_feasibility_CLOSED,
-  gap_cor_bound_interaction_CLOSED
+  gap_no_strict_refutation_certification_CLOSED,
+  gap_empirical_access_required_CLOSED,
+  gap_resource_profile_empirical_floor_CLOSED,
+  gap_fixed_environment_invariance_CLOSED,
+  gap_scalarise_mono_CLOSED,
+  gap_weighted_resource_floor_CLOSED,
+  gap_dynamic_floor_CLOSED,
+  gap_dynamic_monotonicity_CLOSED,
+  gap_dynamic_path_monotonicity_CLOSED,
+  gap_strict_witness_accepts_CLOSED,
+  gap_strict_witness_feasibility_CLOSED,
+  gap_thm_feasibility_PARTIAL,
+  gap_thm_bayes_floor_PARTIAL,
+  gap_thm_serial_decomposition_PARTIAL,
+  gap_thm_nonstationary_search_PARTIAL
 ]
 
 /-- Status-keyed counts:
@@ -765,7 +967,7 @@ def cat3SubTypeCounts : Nat × Nat × Nat × Nat × Nat × Nat :=
       K_codingTheorem, K_chainRule_pair, K_pairNonDecrease,
       K_condMonotone, K_descLength, Bridge_Tarski_RCF_Correctness,
       Bridge_Q_Sigma01_completeness, Bridge_Q_Sigma01_soundness,
-      Bridge_DefExt_Conservative
+      Bridge_DefExt_Conservative, Bayesian_change_of_measure
 
     Cat 3 carriers (paper-novel typed primitives):
       DistinguishedObs, H_e_Obs, Bridge1b_T0, Bridge1b_Tstar
@@ -774,10 +976,11 @@ def cat3SubTypeCounts : Nat × Nat × Nat × Nat × Nat × Nat :=
       Bridge_Encoding_Sstar_T0, Bridge_H_e_distinct_from_Sstar,
       Bridge_Defining_Biconditional
 
-  Cat 3 sub-types not used in this project: `hypothesisPredicate`
-  (paper has no scope/regime predicates beyond Definition-level
-  classes that are already concrete `def`s in `Basic.lean`),
-  `workingAssumption` (no provisional bundles), `conditionalHypothesis`
+    Cat 3 open hypothesis predicate (not declared as a fake axiom):
+      E3_ablation_relevance
+
+  Cat 3 sub-types not used in this project: `workingAssumption`
+  (no provisional bundles), `conditionalHypothesis`
   (no open-problem-conditional results).
 
   Lean kernel (Cat 0; not declared here): propext, Classical.choice,

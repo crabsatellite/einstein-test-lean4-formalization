@@ -41,20 +41,6 @@ variable {W : ObservationalWorld}
 noncomputable def tauMin (R : EinsteinReplacement W) : ℝ∞ :=
   ⨅ s ∈ (R.refutationSet ∩ W.Tech R.t), W.tau s R.t
 
-/-- *Correct-successor* condition: `T*` is the correct successor for a
-    protocol `Π` (Lean: `Pi`) if every experiment performed yields an
-    outcome in `π(T*)`. The paper Theorem~\ref{thm:floor} states this
-    as a hypothesis for narrative clarity, but Remark
-    `\ref{rem:correct-succ-redundant}` of the paper (added in R13) and
-    the proof of `thm_floor` below both show that this hypothesis is
-    *logically redundant* given soundness clause (c) of `Verifier`:
-    the refuting witness `S†` supplied by `sound_c` already lies in
-    `π(T*) \ π(T_0) ⊆ π(T*)`, so the bound goes through without any
-    constraint on the other outcomes of `Π`. -/
-def correctSuccessor (R : EinsteinReplacement W)
-    (Pi : EmpiricalProtocol W R.t) : Prop :=
-  Pi.outcomes ⊆ W.predict R.Tstar
-
 /--
   **Theorem~\ref{thm:floor}: Empirical Verification Floor.**
 
@@ -67,17 +53,12 @@ def correctSuccessor (R : EinsteinReplacement W)
   (Requires the witness `S†` to lie in `outcomes(E)`, which follows
    from `data_disjoint_refutationSet` under (E1).)
 
-  *Note on `hCorrect`:* The parameter `hCorrect : correctSuccessor R 𝔖.Pi`
-  is kept for narrative consistency with paper Theorem~\ref{thm:floor}
-  (and Remark~\ref{rem:correct-succ-redundant}), but is *not used* in
-  the proof — the refuting witness comes directly from `Verifier.sound_c`,
-  which already places it in `π(T*) \ π(T_0)`. We carry the parameter
-  with an underscore prefix to suppress the unused-variable linter
-  while documenting the narrative role.
+  No separate ``correct successor'' hypothesis is carried: the witness
+  supplied by strict-refutation soundness already lies in
+  `π(T*) \ π(T_0)`.
 -/
 theorem thm_floor {R : EinsteinReplacement W} (𝔖 : System W R)
-    (hPass : 𝔖.passes)
-    (_hCorrect : correctSuccessor R 𝔖.Pi) :
+    (hPass : 𝔖.passes) :
     tauMin R ≤ 𝔖.BPi := by
   -- Extract the three components of `passes`.
   obtain ⟨hMout, _hAugSubPredict, hCert⟩ := hPass
@@ -89,7 +70,7 @@ theorem thm_floor {R : EinsteinReplacement W} (𝔖 : System W R)
   -- the strict-refutation set is disjoint from data t; we re-derive the
   -- single membership statement directly via E1.
   have hS_not_in_data : Sdag ∉ W.data R.t := fun hData =>
-    hS_not_in_T0 (R.E1 hData)
+    hS_not_in_T0 (R.E1_T0 hData)
   -- (Step 3) Hence Sdag ∈ outcomes (since augData = data t ∪ outcomes).
   have hS_in_outcomes : Sdag ∈ 𝔖.Pi.outcomes := by
     rcases hS_in_augData with hData | hOut
@@ -117,13 +98,6 @@ theorem thm_floor {R : EinsteinReplacement W} (𝔖 : System W R)
   -- Chain h7 and h8.  `𝔖.BPi` is definitionally `𝔖.Pi.cost`, which
   -- unfolds to the Finset sum.
   exact h7.trans h8
-
-/-- **Remark `floor-corollaries` (a).** The floor is generator-independent:
-    `τ_min` is a function of `(π, T_0, T*, Tech_t, τ)` alone, not of `M`.
-    Two distinct systems on the same candidate produce the same `τ_min`. -/
-theorem tauMin_generator_independent {R : EinsteinReplacement W}
-    (_𝔖₁ _𝔖₂ : System W R) :
-    tauMin R = tauMin R := rfl
 
 /-- **Remark `floor-corollaries` (c).** `τ_min` is non-negative.
     In `ℝ≥0∞`, `0` is the bottom element so this is automatic;

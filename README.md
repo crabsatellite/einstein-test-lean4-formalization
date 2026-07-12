@@ -1,117 +1,117 @@
-# LLM Einstein Test — Lean 4 Formalization
+# LLM Einstein Test - audited Lean 4 support
 
-Formal verification of the five theorems and four corollaries of
+This project is the typed support layer for:
 
-> Li, Alex Chengyu. *What the Karpowicz Theorem Does Not Prove:
-> A Three-Component Decomposition of the LLM Einstein Test.* 2026.
+> Alex Chengyu Li, *What the Karpowicz Theorem Does Not Prove: A
+> Three-Resource Theory of the LLM Einstein Test* (2026).
 
-**Paper:**
-- SSRN abstract id [6751920](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6751920)
-- Zenodo (concept DOI, all versions): [10.5281/zenodo.20126582](https://doi.org/10.5281/zenodo.20126582)
-- Zenodo (v2, current): [10.5281/zenodo.20134745](https://doi.org/10.5281/zenodo.20134745)
+Paper: [SSRN abstract 6751920](https://papers.ssrn.com/abstract=6751920)
 
-## Status
+## Trust statement
 
-The formalization machine-checks the **structural mathematics** of the
-paper end-to-end inside Lean 4 + Mathlib.  Every paper-internal
-deduction is a genuine Lean 4 theorem — **zero `sorry`**.
+The project builds with zero proof holes in retained derived theorems.  That
+does **not** mean the paper has been derived end-to-end from Mathlib.
 
-All axioms are atomic minimal units, classified as one of:
+- The strict-refutation set proofs, empirical-floor deduction, and
+  no-certification contradiction are checked at an abstract set-theoretic
+  level using the Lean kernel and Mathlib.
+- Pareto/scalar resource monotonicity, the weighted empirical floor,
+  availability--acquisition path monotonicity, E1--E2 candidate-recognition
+  hardness, and the deterministic strict-witness feasibility core are
+  machine checked.
+- The Kolmogorov-complexity theorem is a conditional algebraic derivation
+  from five explicitly declared external KC bridge axioms and opaque
+  encodings.  The predicate connecting a generator description to a
+  probability exponent is an explicit trust boundary.
+- The broad-class distinguishability reduction uses abstract carriers,
+  paper-construction equations, and external recursion-theoretic bridges.
+  It is **not** a formal hardness theorem for the paper's Einstein-candidate
+  subclass.
+- The strengthened optional novelty screen (Beth non-definability plus
+  prediction relevance under a declared ablation operator) is not
+  formalised.  The former unconstrained `E3 : Prop` field remains removed.
+- The stochastic confidence layer of the feasibility theorem, the serial
+  expected-cost decomposition, the non-stationary search law, and the
+  sequential change-of-measure theorem are not formalised here.
+  The latter is sourced to Kaufmann, Cappe, and Garivier (2016), Lemma 1,
+  and recorded as an external ledger bridge.
 
-* **Cat 2** — external published textbook results (opaque-carrier-bound
-  + precise citation).
-* **Cat 3** — paper-novel: typed primitive carriers or paper-stated
-  atomic defining equations from Li 2026 `\label{thm:undecidable}`.
-* **Lean kernel** — `propext`, `Classical.choice`, `Quot.sound`.
+The live trust boundary is printed by:
 
-The project has **zero Cat 1 axioms** because the Mathlib infrastructure
-needed for Mathlib-derivability (K-complexity, Robinson Q, Tarski CAD)
-is absent.  Per the v6 ATOMIC MINIMAL UNITS spec, Mathlib infra absence
-alone is not `gapBlocked` — the corresponding claims are accepted on
-external textbook authority and recorded as Cat 2 `gapOpen` axioms.
-
-Every axiom is an atomic minimal unit (no composite bundles).  The
-authoritative current inventory of axiom names, citations, and per-
-theorem dependencies is the `lake env lean EinsteinTest/AxiomAudit.lean`
-output combined with the `#eval` printout at the bottom of
-[`EinsteinTest/Ledger.lean`](EinsteinTest/Ledger.lean); see those
-sources for the live counts and per-axiom citations.
-
-The paper-level theorems most commonly depend only on the Lean
-kernel; `thm_emission` adds the Kolmogorov-complexity bridges, and
-`thm_undecidable_sigma01_hard` adds the recursion-theoretic carriers,
-defining equations, and textbook bridges.
-
-## File structure
-
-| File | Paper component |
-|------|-----------------|
-| [`EinsteinTest/Basic.lean`](EinsteinTest/Basic.lean) | Definitions 1–4 (Observational world; Einstein-replacement (E1)/(E2)/(E3) with Beth-definability; Generator + Verifier with strict-refutation soundness; Empirical protocol; Einstein-Test system) |
-| [`EinsteinTest/Floor.lean`](EinsteinTest/Floor.lean) | Theorem 1 (Empirical Verification Floor) + Remark `floor-corollaries` |
-| [`EinsteinTest/Emission.lean`](EinsteinTest/Emission.lean) | Theorem 2 (Generator KC Emission Lower Bound) + Corollary `rare` + Remark `emission-not-impossible` |
-| [`EinsteinTest/Undecidable.lean`](EinsteinTest/Undecidable.lean) | Theorem 3 (Distinguishability Σ⁰₁-hard on r.e. classes; decidable on Tarski class) + Corollary `no-universal` |
-| [`EinsteinTest/Decomposition.lean`](EinsteinTest/Decomposition.lean) | Theorem 4 (Three-Component Decomposition) + Corollary `bound-interaction` + Corollary `conditional-feasibility` |
-| [`EinsteinTest/SelfVerification.lean`](EinsteinTest/SelfVerification.lean) | Theorem 5 (Self-Verification Impossibility) + Corollary `self-verif-robust` (i–iv) + Corollary `empirical-necessity` + Remark `thm5-substance` |
-| [`EinsteinTest/AxiomAudit.lean`](EinsteinTest/AxiomAudit.lean) | Trust audit: prints `#print axioms` for every paper-level theorem |
-| [`EinsteinTest/Ledger.lean`](EinsteinTest/Ledger.lean) | Typed gap ledger: `GapStatus` × `InputCategory` orthogonal classification, with one `GapEntry` per atomic axiom, blocked route, and closed top-level result |
-
-## Building
-
-Requires Lean 4 toolchain `v4.30.0-rc2` (managed via `elan`).
-
-```bash
-# Install elan + Lean toolchain if not already
-curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh
-
-# Get Mathlib cache (MUST run before `lake build` to avoid rebuilding Mathlib)
-lake exe cache get
-
-# Build
-lake build
-
-# Run axiom audit
+```text
 lake env lean EinsteinTest/AxiomAudit.lean
-```
-
-## Trust verification
-
-For an independent trust check, after `lake build`:
-
-```bash
-# Count of `sorry` (expect 0)
-grep -rn '\bsorry\b' EinsteinTest/
-
-# Print axiom dependencies of every paper-level theorem
-lake env lean EinsteinTest/AxiomAudit.lean
-
-# Print live gap-ledger inventory (status counts, input-category counts)
-# — this is the authoritative inventory of atomic axioms, blocked
-# routes, and closed top-level results
 lake env lean EinsteinTest/Ledger.lean
 ```
 
-## Audit history
+## Complete manuscript result map
 
-The formalization has been through multiple hostile audit rounds.
-The attack history of each axiom (citation revisions, atomic refactors,
-prior retractions) is preserved in the `attackHistory` field of the
-corresponding `GapEntry` in
-[`EinsteinTest/Ledger.lean`](EinsteinTest/Ledger.lean); release-level
-milestones are recorded in commit history and git tags.
+This table covers every numbered theorem, proposition, and corollary in the
+current manuscript.  `Exact` means that the retained Lean statement has the
+same direction, scope, and hypotheses in the abstract model.  `Conditional`
+means that the derivation is kernel checked but depends on the external or
+paper-construction bridges printed by the axiom audit.  `Partial` never means
+an end-to-end machine proof of the paper result.
 
-## Companion paper
+| Paper result | Lean declaration or boundary | Status |
+|---|---|---|
+| `prop:resource-geometry` | `System.ResourceProfile.scalarise_mono`, `weighted_resource_empirical_floor` | Exact |
+| `prop:karpowicz-nonimplication` | Elementary propositional countervaluation in the paper | Paper only |
+| `prop:symmetry` | Computability-scope argument in the paper | Paper only |
+| `thm:floor` | `thm_floor` | Exact |
+| `cor:invariance` | `fixed_environment_invariance` | Exact |
+| `thm:dynamic-floor` | `dynamic_floor_of_witness` | Exact in the abstract dynamic model |
+| `prop:technology-dominance` | `dynamic_tau_mono`, `dynamic_tau_congr`, `path_completion_mono`, `dynamic_path_tau_mono` | Exact |
+| `thm:bayes-floor` | External `Bayesian_change_of_measure` ledger bridge; no Lean probability theorem | Partial |
+| `thm:emission` | `thm_emission` | Conditional on five KC bridges and opaque encodings |
+| `cor:waiting` | `cor_rare` | Exact real-arithmetic consequence |
+| `prop:amplification` | Fixed-search formula and support boundary proved in the paper | Paper only |
+| `prop:corpus-shift` | Algebraic comparative static proved in the paper | Paper only |
+| `thm:nonstationary-search` | Ledgered without a Lean probability proof | Partial |
+| `thm:dist` | `thm_undecidable_sigma01_hard`, `thm_undecidable_sigma02_upper`, `thm_undecidable_tarski_decidable` | Conditional on the listed recursion, construction, and RCF bridges |
+| `thm:candidate-recognition` | `thm_candidate_recognition_sigma01_hard` | Conditional E1--E2 recognition result |
+| `prop:no-transfer` | Scope proof in the paper; no promised-verification Lean claim | Paper only |
+| `thm:feasibility` | `strict_witness_accepts`, `strict_witness_feasibility` | Partial: deterministic core exact; finite-budget probability layer unformalised |
+| `cor:feasibility-boundaries` | Consequences of the paper's quantitative bound | Paper only |
+| `thm:serial-decomposition` | Deterministic weighted aggregation only | Partial: expectation layer unformalised |
+| `cor:kc-serial-decomposition` | Uses the conditional KC result plus the paper-only expectation layer | Partial |
+| `prop:profile` | `resource_profile_empirical_floor` supports clause (iii) only | Partial meta-map |
+| `prop:no-cert` | `no_strict_refutation_certification` | Exact |
+| `cor:resource-invariance` | Direct paper corollary; duplicate Lean alias intentionally omitted | Paper only |
+| `cor:empirical-access` | `empirical_access_required` | Exact |
 
-| Resource | Identifier |
-|----------|------------|
-| SSRN abstract id | [6751920](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6751920) |
-| Zenodo concept DOI (all versions) | [10.5281/zenodo.20126582](https://doi.org/10.5281/zenodo.20126582) |
-| Zenodo v2 DOI (current) | [10.5281/zenodo.20134745](https://doi.org/10.5281/zenodo.20134745) |
-| Zenodo v1 DOI | [10.5281/zenodo.20126583](https://doi.org/10.5281/zenodo.20126583) |
+## Reconstructed and permanently excluded claims
 
-The paper accompanies the Lean formalization in the same directory tree
-under `companion-einstein-test/einstein_test.tex`.  It is part of the
-broader verification-asymmetry research line.
+The following declarations were removed during the 2026-07-12 solidity
+audit because they did not match valid paper claims. Their research content
+was rebuilt where possible:
+
+- raw scalar `thm_decomposition` -> vector, Pareto order, unit-bearing
+  weights, and a conditional serial expected-cost theorem;
+- `cor_conditional_feasibility` -> explicit support, witness probability,
+  verifier completeness, and a quantitative confidence theorem;
+- broad `cor_bound_interaction` -> fixed-frontier invariance plus dynamic
+  technology dominance;
+- four duplicate oracle/self-verification corollaries;
+- the trivial `rem_emission_not_impossible` shadow.
+
+Still permanently excluded are reachability inferred from an emission upper
+bound, broad-class-to-candidate hardness transfer, placeholder `E3 : Prop`,
+and duplicate theorem aliases.
+
+## Build
+
+Requires the toolchain specified in `lean-toolchain`.
+
+```text
+lake exe cache get
+lake build
+lake env lean EinsteinTest/AxiomAudit.lean
+lake env lean EinsteinTest/Ledger.lean
+```
+
+The claim-level audit and revision decisions live in the parent paper
+directory under `meta/CLAIM_AUDIT.md` and `meta/REVISION_LOG_SOLIDITY.md`.
 
 ## License
 
-[MIT](LICENSE) © 2026 Alex Li.
+MIT, 2026 Alex Li.

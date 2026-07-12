@@ -2,7 +2,7 @@
   EinsteinTest/Emission.lean
 
   Theorem~\ref{thm:emission} (Generator KC Emission Lower Bound),
-  Corollary~\ref{cor:rare}, and Remark~\ref{rem:emission-not-impossible}.
+  Corollary~\ref{cor:waiting}.
 
   Companion to: "What the Karpowicz Theorem Does Not Prove" (Li, 2026).
 
@@ -457,7 +457,7 @@ theorem thm_emission
   --         + codingConst + 2·condConst + 2·descConst.
   linarith [h_chain1, h_cond, h_coding, h_chain2, h_desc_M_via_cond, h_desc_p]
 
-/-- **Corollary~\ref{cor:rare}.** If `Pr[M(p) = T*] ≤ 2^{-K_*}` with
+/-- **Corollary~\ref{cor:waiting}.** If `Pr[M(p) = T*] ≤ 2^{-K_*}` with
     `K_* > 0`, then the expected number of i.i.d. samples `N` before
     the first emission satisfies `E[N] ≥ 2^{K_*}` (geometric waiting).
 
@@ -476,22 +476,5 @@ theorem cor_rare (KStarVal p : ℝ) (hp_pos : 0 < p)
       ≤ (2 : ℝ) ^ KStarVal * (2 : ℝ) ^ (-KStarVal) :=
         mul_le_mul_of_nonneg_left hp_le hpow_pos.le
     _ = 1 := h_add
-
-/-- **Remark~\ref{rem:emission-not-impossible}.** Three escape routes
-    make `K_*` non-positive (bound vacuous):
-    (i) test-time search: the sampling exponent in `cor_rare` becomes
-        finite once `N ≥ 2^{K_*}` is afforded;
-    (ii) ripe innovations: `K(T*|D_t)` is small (e.g., the data
-         already encodes `T*` up to a short pointer);
-    (iii) continual training: growing `D_t` reduces `K(T*|D_t)`.
-
-    *Lean-level witness:* for `KStarVal ≤ 0`, `2 ^ KStarVal ≤ 1` so
-    the `cor_rare` bound is vacuous (every protocol with a single
-    sample trivially satisfies `1/p ≥ 1 ≥ 2^{K_*}` when `K_* ≤ 0`). -/
-theorem rem_emission_not_impossible (KStarVal : ℝ) (hKneg : KStarVal ≤ 0) :
-    (2 : ℝ) ^ KStarVal ≤ 1 := by
-  have h0 : (2 : ℝ) ^ (0 : ℝ) = 1 := Real.rpow_zero 2
-  rw [← h0]
-  exact Real.rpow_le_rpow_of_exponent_le (by norm_num : (1 : ℝ) ≤ 2) hKneg
 
 end EinsteinTest
