@@ -1,9 +1,9 @@
 /-
-  Axiom audit for the post-solidity-revision formalisation.
+  Axiom-dependency report for the companion formalization.
 
-  The output is the trust boundary.  A theorem is not described as
-  machine support for a stronger prose statement merely because it has
-  no `sorry`.
+  The output identifies the assumptions used by each exported result.
+  Absence of `sorry` does not remove dependencies on the explicitly
+  listed external or construction bridges.
 -/
 
 import EinsteinTest

@@ -1,7 +1,7 @@
 /-
   EinsteinTest.lean
 
-  Root module for the audited formal support of:
+  Root module for the Lean companion formalization of:
 
     Li, Alex. "What the Karpowicz Theorem Does Not Prove:
               A Three-Resource Theory of the LLM Einstein Test."
@@ -19,23 +19,21 @@
     EinsteinTest/Feasibility.lean       Strict-witness compositional sufficiency
     EinsteinTest/SelfVerification.lean  Strict-refutation no-certification result
 
-  Soundness audit:
+  Axiom-dependency report:
     EinsteinTest/AxiomAudit.lean — prints axiom dependencies of every
-    retained theorem.  The KC and broad-class recursion layers use
+    exported theorem.  The KC and broad-class recursion layers use
     explicitly inventoried external and construction bridges.
 
-  Gap ledger:
+  Formalization inventory:
     EinsteinTest/Ledger.lean — typed record of every atomic axiom,
-    every Cat 3 carrier, every blocked route, and every closed
-    top-level result.  Two orthogonal classifications per entry:
+    every Cat 3 carrier, and every listed top-level result.  Two
+    orthogonal classifications per entry:
       * 6-tier status: gapOpen / gapPartial / gapBlocked / gapDeadEnd /
         gapClosed / gapClosedConditional
       * 4-input-category: cat1Mathlib / cat2External / cat3PaperNovel /
         notInput
-    Plus a `conditionalOn` list of `Hyp_*` broken-link predicate names
-    for any `gapClosedConditional` entries (currently empty for all
-    entries; see v6 §12 broken-link discipline).  Canonical
-    attack-history record.
+    A `conditionalOn` list records any explicit hypotheses on which a
+    conditional closure depends.
 -/
 
 import EinsteinTest.Basic

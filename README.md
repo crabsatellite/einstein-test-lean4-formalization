@@ -1,16 +1,17 @@
-# LLM Einstein Test - audited Lean 4 support
+# LLM Einstein Test - Lean 4 companion formalization
 
-This project is the typed support layer for:
+This project accompanies:
 
 > Alex Chengyu Li, *What the Karpowicz Theorem Does Not Prove: A
 > Three-Resource Theory of the LLM Einstein Test* (2026).
 
 Paper: [SSRN abstract 6751920](https://papers.ssrn.com/abstract=6751920)
 
-## Trust statement
+## Formalization scope
 
-The project builds with zero proof holes in retained derived theorems.  That
-does **not** mean the paper has been derived end-to-end from Mathlib.
+The project contains no `sorry` declarations in its derived theorem proofs.
+It provides machine-checked support for the paper results identified below;
+it does not represent an end-to-end formalization of every result in the paper.
 
 - The strict-refutation set proofs, empirical-floor deduction, and
   no-certification contradiction are checked at an abstract set-theoretic
@@ -27,16 +28,15 @@ does **not** mean the paper has been derived end-to-end from Mathlib.
   paper-construction equations, and external recursion-theoretic bridges.
   It is **not** a formal hardness theorem for the paper's Einstein-candidate
   subclass.
-- The strengthened optional novelty screen (Beth non-definability plus
-  prediction relevance under a declared ablation operator) is not
-  formalised.  The former unconstrained `E3 : Prop` field remains removed.
+- The optional novelty screen (Beth non-definability plus prediction
+  relevance under a declared ablation operator) is not formalised.
 - The stochastic confidence layer of the feasibility theorem, the serial
   expected-cost decomposition, the non-stationary search law, and the
   sequential change-of-measure theorem are not formalised here.
   The latter is sourced to Kaufmann, Cappe, and Garivier (2016), Lemma 1,
-  and recorded as an external ledger bridge.
+  and represented as an explicit external assumption in `Ledger.lean`.
 
-The live trust boundary is printed by:
+The theorem dependencies and formalization inventory are printed by:
 
 ```text
 lake env lean EinsteinTest/AxiomAudit.lean
@@ -46,11 +46,12 @@ lake env lean EinsteinTest/Ledger.lean
 ## Complete manuscript result map
 
 This table covers every numbered theorem, proposition, and corollary in the
-current manuscript.  `Exact` means that the retained Lean statement has the
+paper.  `Exact` means that the Lean statement has the
 same direction, scope, and hypotheses in the abstract model.  `Conditional`
 means that the derivation is kernel checked but depends on the external or
-paper-construction bridges printed by the axiom audit.  `Partial` never means
-an end-to-end machine proof of the paper result.
+paper-construction bridges printed by the dependency report.  `Partial`
+identifies the portion that is formalized without extending the claim to the
+full paper result.
 
 | Paper result | Lean declaration or boundary | Status |
 |---|---|---|
@@ -66,7 +67,7 @@ an end-to-end machine proof of the paper result.
 | `cor:waiting` | `cor_rare` | Exact real-arithmetic consequence |
 | `prop:amplification` | Fixed-search formula and support boundary proved in the paper | Paper only |
 | `prop:corpus-shift` | Algebraic comparative static proved in the paper | Paper only |
-| `thm:nonstationary-search` | Ledgered without a Lean probability proof | Partial |
+| `thm:nonstationary-search` | No Lean probability theorem | Partial |
 | `thm:dist` | `thm_undecidable_sigma01_hard`, `thm_undecidable_sigma02_upper`, `thm_undecidable_tarski_decidable` | Conditional on the listed recursion, construction, and RCF bridges |
 | `thm:candidate-recognition` | `thm_candidate_recognition_sigma01_hard` | Conditional E1--E2 recognition result |
 | `prop:no-transfer` | Scope proof in the paper; no promised-verification Lean claim | Paper only |
@@ -76,27 +77,19 @@ an end-to-end machine proof of the paper result.
 | `cor:kc-serial-decomposition` | Uses the conditional KC result plus the paper-only expectation layer | Partial |
 | `prop:profile` | `resource_profile_empirical_floor` supports clause (iii) only | Partial meta-map |
 | `prop:no-cert` | `no_strict_refutation_certification` | Exact |
-| `cor:resource-invariance` | Direct paper corollary; duplicate Lean alias intentionally omitted | Paper only |
+| `cor:resource-invariance` | Follows directly from `prop:no-cert`; no separate Lean declaration | Paper only |
 | `cor:empirical-access` | `empirical_access_required` | Exact |
 
-## Reconstructed and permanently excluded claims
+## Scope boundaries
 
-The following declarations were removed during the 2026-07-12 solidity
-audit because they did not match valid paper claims. Their research content
-was rebuilt where possible:
-
-- raw scalar `thm_decomposition` -> vector, Pareto order, unit-bearing
-  weights, and a conditional serial expected-cost theorem;
-- `cor_conditional_feasibility` -> explicit support, witness probability,
-  verifier completeness, and a quantitative confidence theorem;
-- broad `cor_bound_interaction` -> fixed-frontier invariance plus dynamic
-  technology dominance;
-- four duplicate oracle/self-verification corollaries;
-- the trivial `rem_emission_not_impossible` shadow.
-
-Still permanently excluded are reachability inferred from an emission upper
-bound, broad-class-to-candidate hardness transfer, placeholder `E3 : Prop`,
-and duplicate theorem aliases.
+- The conditional emission bound does not imply positive target support or
+  finite discovery time.
+- Broad-class distinguishability hardness does not establish hardness for
+  verification promised to remain inside the E1--E3 candidate class.
+- The optional E3 novelty screen requires a first-order syntax and represented
+  ablation operator that are outside the present Lean model.
+- The probability and expectation layers marked `Partial` in the table are
+  proved in the paper but are not claimed as Lean theorems here.
 
 ## Build
 
@@ -108,9 +101,6 @@ lake build
 lake env lean EinsteinTest/AxiomAudit.lean
 lake env lean EinsteinTest/Ledger.lean
 ```
-
-The claim-level audit and revision decisions live in the parent paper
-directory under `meta/CLAIM_AUDIT.md` and `meta/REVISION_LOG_SOLIDITY.md`.
 
 ## License
 

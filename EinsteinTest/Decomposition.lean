@@ -1,14 +1,15 @@
 /-
   EinsteinTest/Decomposition.lean
 
-  Audited resource-profile layer.  The revised paper uses the vector
+  Resource-profile layer.  The paper uses the vector
 
       (B_M, B_V, B_Pi)
 
-  as its primitive resource object.  This module does not reinstate the
-  deleted raw scalar identity.  Its unit-bearing scalarisation algebra is
-  the deterministic core used by the paper's conditional serial expected-
-  cost theorem; the probability/expectation layer remains ledgered partial.
+  as its primitive resource object.  Unit-bearing scalarisation is used
+  only after conversion weights are declared.  The algebra in this module
+  supports the deterministic component of the paper's conditional serial
+  expected-cost theorem; its probability and expectation layer is not
+  formalized here.
 -/
 
 import EinsteinTest.Basic

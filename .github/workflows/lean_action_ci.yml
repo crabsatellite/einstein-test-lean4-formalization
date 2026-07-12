@@ -40,5 +40,5 @@ jobs:
       - name: Run axiom audit
         run: lake env lean EinsteinTest/AxiomAudit.lean
 
-      - name: Print gap-ledger inventory
+      - name: Print formalization inventory
         run: lake env lean EinsteinTest/Ledger.lean

@@ -28,10 +28,9 @@
   extension fails the strengthened E3 screen.  A promise-preserving
   reduction would require both yes and no instances to remain in-domain.
 
-  Lean atomic axiom surface (per `feedback_gap_ledger_in_lean4`
-  ATOMIC MINIMAL UNITS; full Mathlib FO-encoding of Robinson Q is
-  deferred — under v6 this is not `gapBlocked`, since the textbook
-  claims are accepted on external authority as Cat 2 axioms below):
+  Lean axiom surface.  A full Mathlib first-order encoding of Robinson Q
+  is outside this project.  The cited external results and the paper's
+  construction primitives therefore appear as explicit dependencies:
 
   * Cat 3 carriers (paper-novel typed primitives):
       `DistinguishedObs`  — fresh `S*` predicate
